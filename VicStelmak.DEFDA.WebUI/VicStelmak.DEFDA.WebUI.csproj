@@ -4,6 +4,11 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>55e6a3bf-260a-4e53-9492-278c4e5130ba</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VicStelmak.DEFDA.Infrastructure\VicStelmak.DEFDA.Infrastructure.csproj" />
+  </ItemGroup>
 
 </Project>

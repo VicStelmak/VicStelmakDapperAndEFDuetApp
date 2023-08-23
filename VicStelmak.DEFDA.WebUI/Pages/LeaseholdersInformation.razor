@@ -1,0 +1,66 @@
+﻿@page "/leaseholdersinformation"
+
+@using VicStelmak.DEFDA.Infrastructure.DataAccess;
+@using VicStelmak.DEFDA.WebUI.Models
+
+@inject IDbAccess _data
+@inject IConfiguration _config
+
+<h3>Information About Leaseholders</h3><br />
+
+<button class="btn btn-primary" @onclick="InsertData">Insert</button>
+<button class="btn btn-warning" @onclick="UpdateData">Update</button>
+<button class="btn btn-danger" @onclick="DeleteData">Delete</button>
+<br /> <br />
+
+@if (leaseholdersRoster == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @foreach (var leaseholder in leaseholdersRoster)
+    {
+        <p>
+            @leaseholder.LeaseholderId @leaseholder.FirstName @leaseholder.LastName @leaseholder.Email
+        </p>
+    }
+}
+
+@code {
+    List<LeaseholderModel> leaseholdersRoster;
+
+    private async Task InsertData()
+    {
+        string sql = "insert into leaseholders (LeaseholderId, FirstName, LastName, Email) values (@LeaseholderId, @FirstName, @LastName, @Email);";
+
+        await _data.SaveData(sql, new { LeaseholderId = 37, FirstName = "Funky", LastName = "Africa", Email = "funky@email.com" }, _config.GetConnectionString("DapperDbConnection"));
+
+        await OnInitializedAsync();
+    }
+
+    private async Task UpdateData()
+    {
+        string sql = "update leaseholders set FirstName = @FirstName where LastName = @LastName";
+
+        await _data.SaveData(sql, new { FirstName = "Funktor", LastName = "Africa" }, _config.GetConnectionString("DapperDbConnection"));
+
+        await OnInitializedAsync();
+    }
+
+    private async Task DeleteData()
+    {
+        string sql = "delete from leaseholders where LastName = @LastName";
+
+        await _data.SaveData(sql, new { LastName = "Africa" }, _config.GetConnectionString("DapperDbConnection"));
+
+        await OnInitializedAsync();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        string sql = "select * from leaseholders";
+
+        leaseholdersRoster = await _data.LoadData<LeaseholderModel, dynamic>(sql, new { }, _config.GetConnectionString("DapperDbConnection"));
+    }
+}
