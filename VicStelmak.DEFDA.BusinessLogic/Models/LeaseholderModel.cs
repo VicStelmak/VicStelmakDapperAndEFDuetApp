@@ -1,4 +1,4 @@
-﻿namespace VicStelmak.DEFDA.WebUI.Models
+﻿namespace VicStelmak.DEFDA.BusinessLogic.Models
 {
     public class LeaseholderModel
     {
