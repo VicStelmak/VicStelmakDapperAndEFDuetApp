@@ -1,0 +1,72 @@
+﻿@page "/leaseholdersinformation_entityframework/details/{id:int}"
+
+<PageTitle>Leaseholders Information</PageTitle>
+
+@if (Leaseholder != null)
+{
+    <div class="row">
+        <div class="col-lg-9">
+            <h1>@Leaseholder.FirstName @Leaseholder.LastName</h1>
+        </div>
+        <div class="col-lg-3 text-right">
+            <a class="btn btn-secondary btn-sm" href="/leaseholdersinformation_entityframework" role="button">Go Back To List</a>
+        </div>
+    </div>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th scope="row">Leaseholder Id</th>
+                <td>@Leaseholder.Id</td>
+            </tr>
+            <tr>
+                <th scope="row">Leaseholder First Name</th>
+                <td>@Leaseholder.FirstName</td>
+            </tr>
+            <tr>
+                <th scope="row">Leaseholder Last Name</th>
+                <td>@Leaseholder.LastName</td>
+            </tr>
+            <tr>
+                <th scope="row">Leaseholder Addresses</th>
+                <td>
+                    <ul>
+                        @foreach (var address in Addresses.Where(a => a.LeaseholderId == Leaseholder.Id))
+                        {
+                            <li>@address.PostalCode, @address.ApartmentNumber, @address.BuildingNumber, @address.Street, @address.City, @address.Region</li>
+                        }
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">Leaseholder's Email Addresses</th>
+                <td>
+                    <ul>
+                        @foreach(var emailAddress in EmailAddresses.Where(e => e.LeaseholderId == Leaseholder.Id))
+                        {
+                            <li>@emailAddress.EmailAddress</li>
+                        }
+                    </ul>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    public LeaseholderModel Leaseholder { get; set; }
+
+    private List<AddressModel> Addresses { get; set; }
+    private List<EmailAddressModel> EmailAddresses { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Leaseholder = await _leaseholderService.GetLeaseholderByIdAsync(Id);
+        EmailAddresses = await _emailAddressService.GetEmailAddressesListAsync();
+        Addresses = await _addressService.GetAddressesListAsync();
+    }
+}
+}
+

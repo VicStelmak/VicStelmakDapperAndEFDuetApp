@@ -1,0 +1,33 @@
+﻿@inject NavigationManager _navManager
+
+<EditForm Model="@EmailAddress" OnValidSubmit="@SubmitEmailAddressAsync">
+    <div class="form-group">
+        <label>Please Edit Your Email Address Below:</label>
+        <InputText class="form-control" @bind-Value="EmailAddress.EmailAddress" />
+    </div>
+
+    <button style="margin: 7px 0px" type="submit" class="btn btn-primary">Update</button>
+    <button style="margin: 7px 0px" @onclick="@(e => CancelEdit())" class="btn btn-warning">Cancel</button>
+ </EditForm>
+
+@code {
+    [Parameter]
+    public EmailAddressModel EmailAddress { get; set; }
+
+    private async void SubmitEmailAddressAsync()
+    {
+        if (!string.IsNullOrEmpty(EmailAddress.EmailAddress))
+        {
+            await _emailAddressService.UpdateEmailAddressAsync(EmailAddress);
+        }
+     
+        _navManager.NavigateTo(_navManager.Uri, true);
+    }
+
+    private void CancelEdit()
+    {
+        _navManager.NavigateTo(_navManager.Uri, true);
+    }
+}
+
+

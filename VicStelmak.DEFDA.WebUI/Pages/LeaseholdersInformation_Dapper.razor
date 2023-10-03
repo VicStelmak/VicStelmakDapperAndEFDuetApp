@@ -1,6 +1,5 @@
-﻿@page "/leaseholdersinformation"
+﻿@page "/leaseholdersinformation_dapper"
 
-@using VicStelmak.DEFDA.BusinessLogic.Models;
 @using VicStelmak.DEFDA.Infrastructure.DataAccess;
 
 @inject IDbAccess _data
@@ -22,7 +21,7 @@ else
     @foreach (var leaseholder in leaseholdersRoster)
     {
         <p>
-            @leaseholder.LeaseholderId @leaseholder.FirstName @leaseholder.LastName @leaseholder.Email
+            @leaseholder.Id @leaseholder.FirstName @leaseholder.LastName @leaseholder.EmailAddresses
         </p>
     }
 }
@@ -32,9 +31,10 @@ else
 
     private async Task InsertData()
     {
-        string sql = "insert into leaseholders (LeaseholderId, FirstName, LastName, Email) values (@LeaseholderId, @FirstName, @LastName, @Email);";
+        string sql = "insert into leaseholders (Id, FirstName, LastName) values (@Id, @FirstName, @LastName);";
 
-        await _data.SaveData(sql, new { LeaseholderId = 37, FirstName = "Funky", LastName = "Africa", Email = "funky@email.com" }, _config.GetConnectionString("DapperDbConnection"));
+        await _data.SaveData(sql, new { Id = 37, FirstName = "Funky", LastName = "Africa" }, 
+            _config.GetConnectionString("DapperDbConnection"));
 
         await OnInitializedAsync();
     }

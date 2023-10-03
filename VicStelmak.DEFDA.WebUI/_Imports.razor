@@ -1,4 +1,9 @@
-﻿@using System.Net.Http
+﻿@inject IAddressService _addressService
+@inject IEmailAddressService _emailAddressService
+@inject ILeaseholderService _leaseholderService
+@using Blazored.Modal
+@using Blazored.Modal.Services
+@using System.Net.Http
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Forms
@@ -6,5 +11,9 @@
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Web.Virtualization
 @using Microsoft.JSInterop
+@using VicStelmak.DEFDA.Application.Interfaces
+@using VicStelmak.DEFDA.BusinessLogic.Models
 @using VicStelmak.DEFDA.WebUI
 @using VicStelmak.DEFDA.WebUI.Shared
+
+

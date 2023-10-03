@@ -1,0 +1,122 @@
+﻿@page "/leaseholdersinformation_entityframework"
+
+@using VicStelmak.DEFDA.WebUI.Pages.Components;
+
+<PageTitle>Leaseholders Information</PageTitle>
+
+@inject NavigationManager _navManager
+
+<h1>Leaseholders Information</h1>
+
+<div class="row">
+    <div class="col-lg-3 text-right">
+        <button class="btn btn-success btn-sm" @onclick="@(() => ShowAddLeaseholderModalWindowAsync())" role="button">Add New Leaseholder</button>
+    </div>
+</div>
+<br />
+
+@if (Leaseholders != null && Leaseholders.Count > 0)
+{
+    <table class="table table-bordered table-striped table-sm">
+        <thead>
+            <tr>
+                <th>Seq. No.</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Addresses</th>
+                <th>Email Addresses</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var leaseholder in Leaseholders)
+            {
+                SequenceNumber += 1;
+                <tr>
+                    <td>@SequenceNumber</td>
+                    <td>@leaseholder.FirstName</td>
+                    <td>@leaseholder.LastName</td>
+                    <td>
+                        <ul>
+                            @foreach (var address in Addresses.Where(a => a.LeaseholderId == leaseholder.Id))
+                            {
+                                if(address.LeaseholderId != null)
+                                {
+                                    <li>@address.PostalCode, @address.ApartmentNumber, @address.BuildingNumber, @address.Street, @address.City, @address.Region</li>
+                                }
+                            }
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            @foreach (var emailAddress in EmailAddresses.Where(e => e.LeaseholderId == leaseholder.Id))
+                            {
+                                if (emailAddress.LeaseholderId != null)
+                                {
+                                    <li>@emailAddress.EmailAddress</li>
+                                }
+                            }
+                        </ul>
+                    </td>
+                    <td class="text-right">
+                        <a class="btn btn-primary btn-sm" href="/leaseholdersinformation_entityframework/details/@leaseholder.Id" role="button">Details</a>
+                        <a class="btn btn-secondary btn-sm" href="/leaseholdersinformation_entityframework/edit/@leaseholder.Id" role="button">Edit</a>
+                        <button class="btn btn-success btn-sm" @onclick="@(() => ShowAddAddressModalWindowAsync(leaseholder))" role="button">Add Address</button>
+                        <button class="btn btn-success btn-sm" @onclick="@(() => ShowAddEmailAddressModalWindowAsync(leaseholder))" role="button">Add Email Address</button>
+                        <button class="btn btn-danger btn-sm" @onclick="@(() => ShowLeaseholderDeletionConfirmationModalWindowAsync(leaseholder))" role="button">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@code {
+    [CascadingParameter]
+    public IModalService? ModalService { get; set; }
+
+    private int SequenceNumber = 0;
+
+    private List<AddressModel> Addresses { get; set; }
+    private List<EmailAddressModel> EmailAddresses { get; set; }
+    private List<LeaseholderModel> Leaseholders { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Leaseholders = await _leaseholderService.GetLeaseholdersListAsync();
+        EmailAddresses = await _emailAddressService.GetEmailAddressesListAsync();
+        Addresses = await _addressService.GetAddressesListAsync();
+    }
+
+    private async Task ShowAddAddressModalWindowAsync(LeaseholderModel leaseholder)
+    {
+        var modalParameters = new ModalParameters();
+        modalParameters.Add(nameof(AddAddressToLeaseholder_EntityFramework.Leaseholder), leaseholder);
+
+        var addAddressEditForm = ModalService.Show<AddAddressToLeaseholder_EntityFramework>("Add Address to Leaseholder", modalParameters);
+        var addAddressEditFormResult = await addAddressEditForm.Result;
+    }
+
+    private async Task ShowAddEmailAddressModalWindowAsync(LeaseholderModel leaseholder)
+    {
+        var modalParameters = new ModalParameters();
+        modalParameters.Add(nameof(AddEmailAddressToLeaseholder_EntityFramework.Leaseholder), leaseholder);
+
+        var addEmailAddressEditForm = ModalService.Show<AddEmailAddressToLeaseholder_EntityFramework>("Add Email Address to Leaseholder", modalParameters);
+        var addEmailAddressEditFormResult = await addEmailAddressEditForm.Result;
+    }
+
+    private async Task ShowLeaseholderDeletionConfirmationModalWindowAsync(LeaseholderModel leaseholder)
+    {
+        var modalParameters = new ModalParameters();
+        modalParameters.Add(nameof(LeaseholderDeletionConfirmation_EntityFramework.Leaseholder), leaseholder);
+
+        var addEmailAddressEditForm = ModalService.Show<LeaseholderDeletionConfirmation_EntityFramework>("Are you sure you want to delete this leaseholder?", modalParameters);
+        var addEmailAddressEditFormResult = await addEmailAddressEditForm.Result;
+    }
+
+    private async Task ShowAddLeaseholderModalWindowAsync()
+    {
+        var addLeaseholderEditForm = ModalService.Show<AddLeaseholder_EntityFramework>("Add New Leaseholder");
+        var addLeaseholderEditFormResult = await addLeaseholderEditForm.Result;
+    }
+}

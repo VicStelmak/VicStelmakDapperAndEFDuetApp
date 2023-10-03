@@ -1,15 +1,15 @@
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using VicStelmak.DEFDA.Infrastructure.DataAccess;
+using Blazored.Modal;
+using VicStelmak.DEFDA.Infrastructure;
 using VicStelmak.DEFDA.WebUI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddBlazoredModal();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
-builder.Services.AddSingleton<IDbAccess, DbAccess>();
+builder.Services.ConfigureDependencyInjection(builder.Configuration);
 
 var app = builder.Build();
 

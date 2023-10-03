@@ -9,6 +9,15 @@
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.143" />
     <PackageReference Include="MySql.Data" Version="8.1.0" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DataAccess\Migrations\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VicStelmak.DEFDA.Application\VicStelmak.DEFDA.Application.csproj" />
   </ItemGroup>
 
 </Project>

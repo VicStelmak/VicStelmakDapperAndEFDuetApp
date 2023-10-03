@@ -1,0 +1,29 @@
+﻿@inject NavigationManager _navManager
+
+<div>
+    <button class="btn btn-danger btn-sm" @onclick="@(l => DeleteAddressAsync(Address))" role="button">Confirm</button>
+    <button class="btn btn-warning btn-sm" @onclick="@(() => CancelDeletion())" role="button">Cancel</button>
+</div>
+
+@code {
+    [CascadingParameter]
+    public IModalService? ModalService { get; set; }
+
+    [Parameter]
+    public AddressModel Address { get; set; }
+
+    private async Task DeleteAddressAsync(AddressModel address)
+    {
+        if (address != null)
+        {
+            await _addressService.DeleteAddressAsync(address);
+        }
+
+        _navManager.NavigateTo(_navManager.Uri, true);
+    }
+
+    private void CancelDeletion()
+    {
+        _navManager.NavigateTo(_navManager.Uri, true);
+    }
+}

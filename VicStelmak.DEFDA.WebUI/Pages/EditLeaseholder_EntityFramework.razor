@@ -1,0 +1,178 @@
+﻿@page "/leaseholdersinformation_entityframework/edit/{id:int}"
+@using VicStelmak.DEFDA.WebUI.Pages.Components;
+
+@inject NavigationManager _navManager
+
+@if (Leaseholder != null)
+{
+    <div class="row">
+        <div class="col-lg-9">
+            <h1>@Leaseholder.FirstName @Leaseholder.LastName</h1>
+        </div>
+        <div class="col-lg-3 text-right">
+            <a class="btn btn-secondary btn-sm" href="/leaseholdersinformation_entityframework" role="button">Go Back To List</a>
+        </div>
+    </div>
+
+    <label style="margin:7px 0px">Personal Details:</label>
+    <EditForm Model="@Leaseholder" OnValidSubmit="@SubmitLeaseholderAsync">
+        <div class="form-group">
+            <label>First Name</label>
+            <InputText class="form-control" @bind-Value="Leaseholder.FirstName" />
+        </div>
+        <div class="form-group">
+            <label>Last Name</label>
+            <InputText class="form-control" @bind-Value="Leaseholder.LastName" />
+        </div>
+        
+        <button style="margin: 7px 0px" type="submit" class="btn btn-primary">Update</button>
+    </EditForm>
+
+    <label style="margin:7px 0px">Email Addresses</label>
+    @if (EmailAddresses != null && EmailAddresses.Count > 0)
+    {
+        <table style="text-align:center;vertical-align:middle" class="table table-bordered table-striped table-sm">
+            <thead>
+                <tr style="display:flex;margin-right:50%">
+                    <th style="flex:1">Email Address</th>
+                    <th style="flex:1">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var emailAddress in EmailAddresses.Where(e => e.LeaseholderId == Id))
+                {
+                    <tr style="display:flex;margin-right:50%">
+                        <td style="flex:1">@emailAddress.EmailAddress</td>
+                        <td style="flex:1;text-align:left">
+                            <button class="btn btn-secondary btn-sm" @onclick="@(() => ShowEditEmailAddressModalWindowAsync(emailAddress))" role="button">Edit</button>
+                            <button class="btn btn-danger btn-sm" @onclick="@(() => ShowEmailAddressDeletionConfirmationModalWindowAsync(emailAddress))" role="button">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <label style="margin:7px 0px">Addresses</label>
+    @if (Addresses != null && Addresses.Count > 0)
+    {
+        <table style="text-align:center" class="table table-bordered table-striped table-sm">
+            <thead>
+                <tr style="display:flex;margin-right:50%;text-align:center">
+                    <th style="flex:1;padding-top:2%">Postal Code</th>
+                    <th style="flex:1">Apartment Number</th>
+                    <th style="flex:1">Building Number</th>
+                    <th style="flex:1;padding-top:2%">Street</th>
+                    <th style="flex:1;padding-top:2%">City</th>
+                    <th style="flex:1;padding-top:2%">Region</th>
+                    <th style="flex:1;padding-top:2%">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var address in Addresses.Where(a => a.LeaseholderId == Id))
+                {
+                    <tr style="display:flex;margin-right:50%;">
+                        <td style="flex:1;padding-top:3%">@address.PostalCode</td>
+                        <td style="flex:1;padding-top:3%">@address.ApartmentNumber</td>
+                        <td style="flex:1;padding-top:3%">@address.BuildingNumber</td>
+                        <td style="flex:1;padding-top:3%">@address.Street</td>
+                        <td style="flex:1;padding-top:3%">@address.City</td>
+                        <td style="flex:1;padding-top:3%">@address.Region</td>
+                        <td style="text-align:left;flex:1;padding-top:3%">
+                            <button class="btn btn-secondary btn-sm" @onclick="@(() => ShowEditAddressModalWindowAsync(address))" role="button">Edit</button>
+                            <button class="btn btn-danger btn-sm" @onclick="@(() => ShowAddressDeletionConfirmationModalWindowAsync(address))" role="button">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    [CascadingParameter]
+    public IModalService? ModalService { get; set; }
+
+    [Parameter]
+    public int Id { get; set; }
+    
+    [Parameter]
+    public AddressModel Address { get; set; }
+    [Parameter]
+    public EmailAddressModel EmailAddress { get; set; }
+    
+    private LeaseholderModel Leaseholder { get; set; }
+
+    private List<AddressModel> Addresses { get; set; }
+    [Parameter]
+    public List<EmailAddressModel> EmailAddresses { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Address = await _addressService.GetAddressByIdAsync(Id);
+        EmailAddress = await _emailAddressService.GetEmailAddressByIdAsync(Id);
+        Leaseholder = await _leaseholderService.GetLeaseholderByIdAsync(Id);
+        EmailAddresses = await _emailAddressService.GetEmailAddressesListAsync();
+        Addresses = await _addressService.GetAddressesListAsync();
+    }
+
+    private async Task ShowAddressDeletionConfirmationModalWindowAsync(AddressModel address)
+    {
+        var modalParameters = new ModalParameters();
+        modalParameters.Add(nameof(AddressDeletionConfirmation_EntityFramework.Address), address);
+
+        var addEmailEditForm = ModalService.Show<AddressDeletionConfirmation_EntityFramework>("Are you sure you want to delete this address?", modalParameters);
+        var addEmailEditFormResult = await addEmailEditForm.Result;
+    }
+
+    private async Task ShowEditAddressModalWindowAsync(AddressModel address)
+    {
+        var modalParameters = new ModalParameters();
+        modalParameters.Add(nameof(EditAddress_EntityFramework.Address), address);
+
+        var editAddressForm = ModalService.Show<EditAddress_EntityFramework>("You can edit leaseholder's address below:", modalParameters);
+        var editAddressFormResult = await editAddressForm.Result;
+    }
+
+    private async Task ShowEmailAddressDeletionConfirmationModalWindowAsync(EmailAddressModel emailAddress)
+    {
+        var modalParameters = new ModalParameters();
+        modalParameters.Add(nameof(EmailAddressDeletionConfirmation_EntityFramework.EmailAddress), emailAddress);
+
+        var addEmailAddressEditForm = ModalService.Show<EmailAddressDeletionConfirmation_EntityFramework>("Are you sure you want to delete this email address?", modalParameters);
+        var addEmailAddressEditFormResult = await addEmailAddressEditForm.Result;
+    }
+
+    private async Task ShowEditEmailAddressModalWindowAsync(EmailAddressModel emailAddress)
+    {
+        var modalParameters = new ModalParameters();
+        modalParameters.Add(nameof(EditEmailAddress_EntityFramework.EmailAddress), emailAddress);
+
+        var editEmailAddressForm = ModalService.Show<EditEmailAddress_EntityFramework>("You can edit leaseholder's email address below:", modalParameters);
+        var editEmailAddressFormResult = await editEmailAddressForm.Result;
+    }
+
+    private async void SubmitLeaseholderAsync()
+    {
+        await _leaseholderService.UpdateLeaseholderAsync(Leaseholder);
+
+        _navManager.NavigateTo(_navManager.Uri, true);
+    }
+
+    private async Task DeleteAddressAsync(int addressId)
+    {
+        Address = Addresses.First(a => a.Id == addressId);
+        if (Address != null)
+        {
+            await _addressService.DeleteAddressAsync(Address);
+            Addresses.RemoveAll(a => a.Id == addressId);
+
+            _navManager.NavigateTo(_navManager.Uri, true);
+        }
+    }
+
+    private void CancelEdit()
+    {
+        _navManager.NavigateTo(_navManager.Uri, true);
+    }
+}
