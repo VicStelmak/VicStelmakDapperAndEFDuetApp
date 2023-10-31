@@ -1,8 +1,8 @@
 ﻿@inject NavigationManager _navManager
 
 <div>
-    <button class="btn btn-danger btn-sm" @onclick="@(l => DeleteEmailAddressAsync(EmailAddress))" role="button">Confirm</button>
-    <button class="btn btn-warning btn-sm" @onclick="@(() => CancelDeletion())" role="button">Cancel</button>
+    <button type="button" class="btn btn-danger btn-sm" @onclick="@(l => DeleteEmailAddressAsync(EmailAddress))">Confirm</button>
+    <button type="button" class="btn btn-warning btn-sm" @onclick="@(() => CancelDeletion())">Cancel</button>
 </div>
 
 @code {

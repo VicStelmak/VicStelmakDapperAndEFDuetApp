@@ -2,30 +2,28 @@
 
 <EditForm Model="@EmailAddress" OnValidSubmit="@SubmitEmailAddressAsync">
     <div class="form-group">
-        <label>Please Edit Your Email Address Below:</label>
         <InputText class="form-control" @bind-Value="EmailAddress.EmailAddress" />
     </div>
-
-    <button style="margin: 7px 0px" type="submit" class="btn btn-primary">Update</button>
-    <button style="margin: 7px 0px" @onclick="@(e => CancelEdit())" class="btn btn-warning">Cancel</button>
- </EditForm>
+    <button type="submit" class="btn btn-primary" style="flex:1;margin: 7px 0px">Update</button>
+    <button type="button" class="btn btn-warning" style="flex:1;margin: 7px 0px" @onclick="CancelEdit">Cancel</button>
+</EditForm>
 
 @code {
     [Parameter]
     public EmailAddressModel EmailAddress { get; set; }
 
-    private async void SubmitEmailAddressAsync()
+    private void CancelEdit()
     {
-        if (!string.IsNullOrEmpty(EmailAddress.EmailAddress))
-        {
-            await _emailAddressService.UpdateEmailAddressAsync(EmailAddress);
-        }
-     
         _navManager.NavigateTo(_navManager.Uri, true);
     }
 
-    private void CancelEdit()
+    private async void SubmitEmailAddressAsync()
     {
+        if (string.IsNullOrEmpty(EmailAddress.EmailAddress) == false)
+        {
+            await _emailAddressService.UpdateEmailAddressAsync(EmailAddress);
+        }
+
         _navManager.NavigateTo(_navManager.Uri, true);
     }
 }

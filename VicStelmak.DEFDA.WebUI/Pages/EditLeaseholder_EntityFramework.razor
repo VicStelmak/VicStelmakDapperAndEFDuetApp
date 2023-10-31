@@ -1,39 +1,48 @@
 ﻿@page "/leaseholdersinformation_entityframework/edit/{id:int}"
-@using VicStelmak.DEFDA.WebUI.Pages.Components;
 
+@using VicStelmak.DEFDA.WebUI.Pages.Components;
 @inject NavigationManager _navManager
 
 @if (Leaseholder != null)
 {
     <div class="row">
         <div class="col-lg-9">
-            <h1>@Leaseholder.FirstName @Leaseholder.LastName</h1>
+            <h1>Edit Leaseholder's Details</h1>
         </div>
         <div class="col-lg-3 text-right">
-            <a class="btn btn-secondary btn-sm" href="/leaseholdersinformation_entityframework" role="button">Go Back To List</a>
+            <a type="button" class="btn btn-secondary btn-sm" href="/leaseholdersinformation_entityframework">Go Back To List</a>
         </div>
     </div>
 
     <label style="margin:7px 0px">Personal Details:</label>
-    <EditForm Model="@Leaseholder" OnValidSubmit="@SubmitLeaseholderAsync">
-        <div class="form-group">
-            <label>First Name</label>
-            <InputText class="form-control" @bind-Value="Leaseholder.FirstName" />
-        </div>
-        <div class="form-group">
-            <label>Last Name</label>
-            <InputText class="form-control" @bind-Value="Leaseholder.LastName" />
-        </div>
-        
-        <button style="margin: 7px 0px" type="submit" class="btn btn-primary">Update</button>
-    </EditForm>
+    <table class="table table-bordered table-striped table-sm" style="text-align:center;vertical-align:middle">
+        <thead>
+            <tr style="display:flex;margin-right:50%">
+                <th style="flex:1">First Name</th>
+                <th style="flex:1">Last Name</th>
+                <th style="flex:1">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="display:flex;margin-right:50%">
+                <td style="flex:1">@Leaseholder.FirstName</td>
+                <td style="flex:1">@Leaseholder.LastName</td>
+                <td style="flex:1;text-align:left">
+                    <button type="button" class="btn btn-secondary btn-sm" @onclick="@(() => ShowEditLeaseholderPersonalDetailsModalWindowAsync(Leaseholder))">Edit</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
     <label style="margin:7px 0px">Email Addresses</label>
     @if (EmailAddresses != null && EmailAddresses.Count > 0)
     {
-        <table style="text-align:center;vertical-align:middle" class="table table-bordered table-striped table-sm">
+        sequenceNumber = 0;
+        
+        <table class="table table-bordered table-striped table-sm" style="text-align:center;vertical-align:middle">
             <thead>
                 <tr style="display:flex;margin-right:50%">
+                    <th style="flex:1">Seq. No.</th>
                     <th style="flex:1">Email Address</th>
                     <th style="flex:1">Actions</th>
                 </tr>
@@ -41,11 +50,14 @@
             <tbody>
                 @foreach (var emailAddress in EmailAddresses.Where(e => e.LeaseholderId == Id))
                 {
+                    IncrementSequenceNumber();
+
                     <tr style="display:flex;margin-right:50%">
+                        <td style="flex:1">@sequenceNumber</td>
                         <td style="flex:1">@emailAddress.EmailAddress</td>
                         <td style="flex:1;text-align:left">
-                            <button class="btn btn-secondary btn-sm" @onclick="@(() => ShowEditEmailAddressModalWindowAsync(emailAddress))" role="button">Edit</button>
-                            <button class="btn btn-danger btn-sm" @onclick="@(() => ShowEmailAddressDeletionConfirmationModalWindowAsync(emailAddress))" role="button">Delete</button>
+                            <button type="button" class="btn btn-secondary btn-sm" @onclick="@(() => ShowEditEmailAddressModalWindowAsync(emailAddress))">Edit</button>
+                            <button type="button" class="btn btn-danger btn-sm" @onclick="@(() => ShowEmailAddressDeletionConfirmationModalWindowAsync(emailAddress))">Delete</button>
                         </td>
                     </tr>
                 }
@@ -56,9 +68,12 @@
     <label style="margin:7px 0px">Addresses</label>
     @if (Addresses != null && Addresses.Count > 0)
     {
-        <table style="text-align:center" class="table table-bordered table-striped table-sm">
+        sequenceNumber = 0;
+
+        <table class="table table-bordered table-striped table-sm" style="text-align:center">
             <thead>
                 <tr style="display:flex;margin-right:50%;text-align:center">
+                    <th style="flex:1">Seq. No.</th>
                     <th style="flex:1;padding-top:2%">Postal Code</th>
                     <th style="flex:1">Apartment Number</th>
                     <th style="flex:1">Building Number</th>
@@ -71,7 +86,10 @@
             <tbody>
                 @foreach (var address in Addresses.Where(a => a.LeaseholderId == Id))
                 {
+                    IncrementSequenceNumber();
+
                     <tr style="display:flex;margin-right:50%;">
+                        <td style="flex:1;padding-top:3%">@sequenceNumber</td>
                         <td style="flex:1;padding-top:3%">@address.PostalCode</td>
                         <td style="flex:1;padding-top:3%">@address.ApartmentNumber</td>
                         <td style="flex:1;padding-top:3%">@address.BuildingNumber</td>
@@ -79,8 +97,8 @@
                         <td style="flex:1;padding-top:3%">@address.City</td>
                         <td style="flex:1;padding-top:3%">@address.Region</td>
                         <td style="text-align:left;flex:1;padding-top:3%">
-                            <button class="btn btn-secondary btn-sm" @onclick="@(() => ShowEditAddressModalWindowAsync(address))" role="button">Edit</button>
-                            <button class="btn btn-danger btn-sm" @onclick="@(() => ShowAddressDeletionConfirmationModalWindowAsync(address))" role="button">Delete</button>
+                            <button type="button" class="btn btn-secondary btn-sm" @onclick="@(() => ShowEditAddressModalWindowAsync(address))">Edit</button>
+                            <button type="button" class="btn btn-danger btn-sm" @onclick="@(() => ShowAddressDeletionConfirmationModalWindowAsync(address))">Delete</button>
                         </td>
                     </tr>
                 }
@@ -92,20 +110,70 @@
 @code {
     [CascadingParameter]
     public IModalService? ModalService { get; set; }
-
+    [Parameter]
+    public AddressModel Address
+    {
+        get => address;
+        set
+        {
+            address = value;
+            AddressClone = new AddressModel
+                {
+                    Id = value.Id,
+                    PostalCode = value.PostalCode,
+                    ApartmentNumber = value.ApartmentNumber,
+                    BuildingNumber = value.BuildingNumber,
+                    Street = value.Street,
+                    City = value.City,
+                    Region = value.Region
+                };
+        }
+    }
+    [Parameter]
+    public EmailAddressModel EmailAddress
+    {
+        get => emailAddress;
+        set
+        {
+            emailAddress = value;
+            EmailAddressClone = new EmailAddressModel
+                {
+                    Id = value.Id,
+                    EmailAddress = value.EmailAddress
+                };
+        }
+    }
+    [Parameter]
+    public LeaseholderModel Leaseholder
+    {
+        get => leaseholder;
+        set
+        {
+            leaseholder = value;
+            LeaseholderClone = new LeaseholderModel
+                {
+                    Id = value.Id,
+                    FirstName = value.FirstName,
+                    LastName = value.LastName,
+                };
+        }
+    }
     [Parameter]
     public int Id { get; set; }
-    
-    [Parameter]
-    public AddressModel Address { get; set; }
-    [Parameter]
-    public EmailAddressModel EmailAddress { get; set; }
-    
-    private LeaseholderModel Leaseholder { get; set; }
+
+    private AddressModel AddressClone { get; set; }
+    private EmailAddressModel EmailAddressClone { get; set; }
+    private LeaseholderModel LeaseholderClone { get; set; }
+
+    private bool shouldRender;
+    private int sequenceNumber;
+
+    private AddressModel address;
+    private EmailAddressModel emailAddress;
+    private LeaseholderModel leaseholder;
 
     private List<AddressModel> Addresses { get; set; }
-    [Parameter]
-    public List<EmailAddressModel> EmailAddresses { get; set; }
+    private List<EmailAddressModel> EmailAddresses { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -115,14 +183,39 @@
         EmailAddresses = await _emailAddressService.GetEmailAddressesListAsync();
         Addresses = await _addressService.GetAddressesListAsync();
     }
+    //<summary>
+    // OnParametersSet() is being used along with ShouldRender() not to allow razor component to rerender without neccesity.
+    //</summary>
+    protected override void OnParametersSet()
+    {
+        shouldRender = true;
+    } 
+    protected override bool ShouldRender()
+    {
+        if(shouldRender)
+        {
+            shouldRender = false;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private void IncrementSequenceNumber()
+    {
+        sequenceNumber++;
+    }
 
     private async Task ShowAddressDeletionConfirmationModalWindowAsync(AddressModel address)
     {
         var modalParameters = new ModalParameters();
         modalParameters.Add(nameof(AddressDeletionConfirmation_EntityFramework.Address), address);
 
-        var addEmailEditForm = ModalService.Show<AddressDeletionConfirmation_EntityFramework>("Are you sure you want to delete this address?", modalParameters);
-        var addEmailEditFormResult = await addEmailEditForm.Result;
+        var addressDeletionConfirmationWindow = ModalService.Show<AddressDeletionConfirmation_EntityFramework>
+            ("Are you sure you want to delete this address?", modalParameters);
+        var addressDeletionConfirmationWindowResult = await addressDeletionConfirmationWindow.Result;
     }
 
     private async Task ShowEditAddressModalWindowAsync(AddressModel address)
@@ -130,8 +223,19 @@
         var modalParameters = new ModalParameters();
         modalParameters.Add(nameof(EditAddress_EntityFramework.Address), address);
 
-        var editAddressForm = ModalService.Show<EditAddress_EntityFramework>("You can edit leaseholder's address below:", modalParameters);
-        var editAddressFormResult = await editAddressForm.Result;
+        var editAddressEditForm = ModalService.Show<EditAddress_EntityFramework>("You can edit leaseholder's address below:", modalParameters);
+        var editAddressEditFormResult = await editAddressEditForm.Result;
+
+        if (editAddressEditFormResult.Cancelled)
+        {
+            address.Id = AddressClone.Id;
+            address.PostalCode = AddressClone.PostalCode;
+            address.ApartmentNumber = AddressClone.ApartmentNumber;
+            address.BuildingNumber = AddressClone.BuildingNumber;
+            address.Street = AddressClone.Street;
+            address.City = AddressClone.City;
+            address.Region = AddressClone.Region;
+        }
     }
 
     private async Task ShowEmailAddressDeletionConfirmationModalWindowAsync(EmailAddressModel emailAddress)
@@ -139,8 +243,9 @@
         var modalParameters = new ModalParameters();
         modalParameters.Add(nameof(EmailAddressDeletionConfirmation_EntityFramework.EmailAddress), emailAddress);
 
-        var addEmailAddressEditForm = ModalService.Show<EmailAddressDeletionConfirmation_EntityFramework>("Are you sure you want to delete this email address?", modalParameters);
-        var addEmailAddressEditFormResult = await addEmailAddressEditForm.Result;
+        var emailAddressDeletionConfirmationWindow = ModalService.Show<EmailAddressDeletionConfirmation_EntityFramework>
+            ("Are you sure you want to delete this email address?", modalParameters);
+        var emailAddressDeletionConfirmationWindowResult = await emailAddressDeletionConfirmationWindow.Result;
     }
 
     private async Task ShowEditEmailAddressModalWindowAsync(EmailAddressModel emailAddress)
@@ -148,31 +253,40 @@
         var modalParameters = new ModalParameters();
         modalParameters.Add(nameof(EditEmailAddress_EntityFramework.EmailAddress), emailAddress);
 
-        var editEmailAddressForm = ModalService.Show<EditEmailAddress_EntityFramework>("You can edit leaseholder's email address below:", modalParameters);
-        var editEmailAddressFormResult = await editEmailAddressForm.Result;
-    }
+        var editEmailAddressEditForm = ModalService.Show<EditEmailAddress_EntityFramework>("You can edit leaseholder's email address below:", modalParameters);
+        var editEmailAddressEditFormResult = await editEmailAddressEditForm.Result;
 
-    private async void SubmitLeaseholderAsync()
-    {
-        await _leaseholderService.UpdateLeaseholderAsync(Leaseholder);
-
-        _navManager.NavigateTo(_navManager.Uri, true);
-    }
-
-    private async Task DeleteAddressAsync(int addressId)
-    {
-        Address = Addresses.First(a => a.Id == addressId);
-        if (Address != null)
-        {
-            await _addressService.DeleteAddressAsync(Address);
-            Addresses.RemoveAll(a => a.Id == addressId);
-
-            _navManager.NavigateTo(_navManager.Uri, true);
+        if (editEmailAddressEditFormResult.Cancelled)
+        {  
+            emailAddress.Id = EmailAddressClone.Id;
+            emailAddress.EmailAddress = EmailAddressClone.EmailAddress;
         }
     }
 
-    private void CancelEdit()
+    private async Task ShowLeaseholderDeletionConfirmationModalWindowAsync(LeaseholderModel leaseholder)
     {
-        _navManager.NavigateTo(_navManager.Uri, true);
+        var modalParameters = new ModalParameters();
+        modalParameters.Add(nameof(LeaseholderDeletionConfirmation_EntityFramework.Leaseholder), leaseholder);
+
+        var leaseholderDeletionConfirmationWindow = ModalService.Show<LeaseholderDeletionConfirmation_EntityFramework>
+            ("Are you sure you want to delete this leaseholder?", modalParameters);
+        var leaseholderDeletionConfirmationWindowResult = await leaseholderDeletionConfirmationWindow.Result;
+    }
+
+    private async Task ShowEditLeaseholderPersonalDetailsModalWindowAsync(LeaseholderModel leaseholder)
+    {
+        var modalParameters = new ModalParameters();
+        modalParameters.Add(nameof(EditLeaseholderPersonalDetails_EntityFramework.Leaseholder), leaseholder);
+
+        var editLeaseholderPersonalDetailsEditForm = ModalService.Show<EditLeaseholderPersonalDetails_EntityFramework>
+            ("You can edit leaseholder's personal details below:", modalParameters);
+        var editLeaseholderPersonalDetailsEditFormResult = await editLeaseholderPersonalDetailsEditForm.Result;
+
+        if (editLeaseholderPersonalDetailsEditFormResult.Cancelled)
+        {
+            leaseholder.Id = LeaseholderClone.Id;
+            leaseholder.FirstName = LeaseholderClone.FirstName;
+            leaseholder.LastName = LeaseholderClone.LastName;
+        }
     }
 }

@@ -26,8 +26,8 @@
         <InputText class="form-control" @bind-Value="Address.Region" />
     </div>
 
-    <button style="margin: 7px 0px" type="submit" class="btn btn-primary">Update Address</button>
-    <button style="margin: 7px 0px" @onclick="@(e => CancelEdit())" class="btn btn-warning">Cancel</button>
+    <button type="submit" class="btn btn-primary" style="margin: 7px 0px">Update</button>
+    <button type="button" class="btn btn-warning" style="margin: 7px 0px" @onclick="@(a => CancelEdit())">Cancel</button>
 </EditForm>
 
 @code {
