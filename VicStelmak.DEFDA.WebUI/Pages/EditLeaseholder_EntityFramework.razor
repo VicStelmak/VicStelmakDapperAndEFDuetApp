@@ -111,38 +111,9 @@
     [CascadingParameter]
     public IModalService? ModalService { get; set; }
     [Parameter]
-    public AddressModel Address
-    {
-        get => address;
-        set
-        {
-            address = value;
-            AddressClone = new AddressModel
-                {
-                    Id = value.Id,
-                    PostalCode = value.PostalCode,
-                    ApartmentNumber = value.ApartmentNumber,
-                    BuildingNumber = value.BuildingNumber,
-                    Street = value.Street,
-                    City = value.City,
-                    Region = value.Region
-                };
-        }
-    }
+    public AddressModel Address { get; set; }
     [Parameter]
-    public EmailAddressModel EmailAddress
-    {
-        get => emailAddress;
-        set
-        {
-            emailAddress = value;
-            EmailAddressClone = new EmailAddressModel
-                {
-                    Id = value.Id,
-                    EmailAddress = value.EmailAddress
-                };
-        }
-    }
+    public EmailAddressModel EmailAddress { get; set; }
     [Parameter]
     public LeaseholderModel Leaseholder
     {
@@ -161,15 +132,11 @@
     [Parameter]
     public int Id { get; set; }
 
-    private AddressModel AddressClone { get; set; }
-    private EmailAddressModel EmailAddressClone { get; set; }
     private LeaseholderModel LeaseholderClone { get; set; }
 
     private bool shouldRender;
     private int sequenceNumber;
 
-    private AddressModel address;
-    private EmailAddressModel emailAddress;
     private LeaseholderModel leaseholder;
 
     private List<AddressModel> Addresses { get; set; }
@@ -203,9 +170,49 @@
         }
     }
 
+    private AddressModel CreateAddressInstanceCloneVariable(AddressModel address)
+    {
+        AddressModel addressClone = new AddressModel();
+        addressClone.Id = address.Id;
+        addressClone.PostalCode = address.PostalCode;
+        addressClone.ApartmentNumber = address.ApartmentNumber;
+        addressClone.BuildingNumber = address.BuildingNumber;
+        addressClone.Street = address.Street;
+        addressClone.City = address.City;
+        addressClone.Region = address.Region;
+
+        return addressClone;
+    }
+
+    private EmailAddressModel CreateEmailAddressInstanceCloneVariable(EmailAddressModel emailAddress)
+    {
+        EmailAddressModel emailAddressClone = new EmailAddressModel();
+        emailAddressClone.Id = emailAddress.Id;
+        emailAddressClone.EmailAddress = emailAddress.EmailAddress;
+
+        return emailAddressClone;
+    }
+
     private void IncrementSequenceNumber()
     {
         sequenceNumber++;
+    }
+
+    private void RevertAddressInstanceValuesToCloneVariableValues(AddressModel address, AddressModel addressClone)
+    {
+        address.Id = addressClone.Id;
+        address.PostalCode = addressClone.PostalCode;
+        address.ApartmentNumber = addressClone.ApartmentNumber;
+        address.BuildingNumber = addressClone.BuildingNumber;
+        address.Street = addressClone.Street;
+        address.City = addressClone.City;
+        address.Region = addressClone.Region;
+    }
+
+    private void RevertEmailAddressInstanceValuesToCloneVariableValues(EmailAddressModel emailAddress, EmailAddressModel emailAddressClone)
+    {
+        emailAddress.Id = emailAddressClone.Id;
+        emailAddress.EmailAddress = emailAddressClone.EmailAddress;
     }
 
     private async Task ShowAddressDeletionConfirmationModalWindowAsync(AddressModel address)
@@ -220,6 +227,8 @@
 
     private async Task ShowEditAddressModalWindowAsync(AddressModel address)
     {
+        AddressModel addressClone = CreateAddressInstanceCloneVariable(address);
+
         var modalParameters = new ModalParameters();
         modalParameters.Add(nameof(EditAddress_EntityFramework.Address), address);
 
@@ -228,13 +237,7 @@
 
         if (editAddressEditFormResult.Cancelled)
         {
-            address.Id = AddressClone.Id;
-            address.PostalCode = AddressClone.PostalCode;
-            address.ApartmentNumber = AddressClone.ApartmentNumber;
-            address.BuildingNumber = AddressClone.BuildingNumber;
-            address.Street = AddressClone.Street;
-            address.City = AddressClone.City;
-            address.Region = AddressClone.Region;
+            RevertAddressInstanceValuesToCloneVariableValues(address, addressClone);
         }
     }
 
@@ -250,6 +253,8 @@
 
     private async Task ShowEditEmailAddressModalWindowAsync(EmailAddressModel emailAddress)
     {
+        EmailAddressModel emailAddressClone = CreateEmailAddressInstanceCloneVariable(emailAddress);
+
         var modalParameters = new ModalParameters();
         modalParameters.Add(nameof(EditEmailAddress_EntityFramework.EmailAddress), emailAddress);
 
@@ -257,9 +262,8 @@
         var editEmailAddressEditFormResult = await editEmailAddressEditForm.Result;
 
         if (editEmailAddressEditFormResult.Cancelled)
-        {  
-            emailAddress.Id = EmailAddressClone.Id;
-            emailAddress.EmailAddress = EmailAddressClone.EmailAddress;
+        {
+            RevertEmailAddressInstanceValuesToCloneVariableValues(emailAddress, emailAddressClone);
         }
     }
 
