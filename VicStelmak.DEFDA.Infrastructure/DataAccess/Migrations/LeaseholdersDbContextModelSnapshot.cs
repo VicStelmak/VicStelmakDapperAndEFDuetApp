@@ -9,7 +9,7 @@ using VicStelmak.DEFDA.Infrastructure.DataAccess;
 
 namespace VicStelmak.DEFDA.Infrastructure.DataAccess.Migrations
 {
-    [DbContext(typeof(RentalDbContext))]
+    [DbContext(typeof(RentalDbContextEf))]
     partial class LeaseholdersDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

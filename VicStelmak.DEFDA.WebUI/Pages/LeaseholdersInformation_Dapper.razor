@@ -1,66 +1,130 @@
 ﻿@page "/leaseholdersinformation_dapper"
 
-@using VicStelmak.DEFDA.Infrastructure.DataAccess;
+@using VicStelmak.DEFDA.WebUI.Pages.Components_Dapper;
 
-@inject IDbAccess _data
-@inject IConfiguration _config
+<PageTitle>Leaseholders Information</PageTitle>
 
-<h3>Information About Leaseholders</h3><br />
+<h1>Leaseholders Information</h1>
 
-<button class="btn btn-primary" @onclick="InsertData">Insert</button>
-<button class="btn btn-warning" @onclick="UpdateData">Update</button>
-<button class="btn btn-danger" @onclick="DeleteData">Delete</button>
-<br /> <br />
+<div class="row">
+    <div class="col-lg-3 text-right">
+        <button type="button" class="btn btn-success btn-sm" @onclick="@(() => ShowAddLeaseholderModalWindowAsync())">Add New Leaseholder</button>
+    </div>
+</div>
+<br />
 
-@if (leaseholdersRoster == null)
+@if (Leaseholders != null && Leaseholders.Count > 0)
 {
-    <p><em>Loading...</em></p>
-}
-else
-{
-    @foreach (var leaseholder in leaseholdersRoster)
-    {
-        <p>
-            @leaseholder.Id @leaseholder.FirstName @leaseholder.LastName @leaseholder.EmailAddresses
-        </p>
-    }
-}
+    sequenceNumber = 0;
 
+    <table class="table table-bordered table-striped table-sm">
+        <thead>
+            <tr>
+                <th>Seq. No.</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Addresses</th>
+                <th>Email Addresses</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var leaseholder in Leaseholders)
+            {
+                IncrementSequenceNumber();
+
+                <tr>
+                    <td>@sequenceNumber</td>
+                    <td>@leaseholder.FirstName</td>
+                    <td>@leaseholder.LastName</td>
+                    <td>
+                        <ul>
+                            @foreach (var address in Addresses.Where(a => a.LeaseholderId == leaseholder.Id))
+                            {
+                                if (address.LeaseholderId != null)
+                                {
+                                    <li>@address.PostalCode, @address.ApartmentNumber, @address.BuildingNumber, @address.Street, @address.City, @address.Region</li>
+                                }
+                            }
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            @foreach (var emailAddress in EmailAddresses.Where(e => e.LeaseholderId == leaseholder.Id))
+                            {
+                                if (emailAddress.LeaseholderId != null)
+                                {
+                                    <li>@emailAddress.EmailAddress</li>
+                                }
+                            }
+                        </ul>
+                    </td>
+                    <td class="text-right">
+                        <a type="button" class="btn btn-primary btn-sm" href="/leaseholdersinformation_dapper/details/@leaseholder.Id">Details</a>
+                        <a type="button" class="btn btn-secondary btn-sm" href="/leaseholdersinformation_dapper/edit/@leaseholder.Id">Edit</a>
+                        <button type="button" class="btn btn-success btn-sm" @onclick="@(() => ShowAddAddressModalWindowAsync(leaseholder))">Add Address</button>
+                        <button type="button" class="btn btn-success btn-sm" @onclick="@(() => ShowAddEmailAddressModalWindowAsync(leaseholder))">Add Email Address</button>
+                        <button type="button" class="btn btn-danger btn-sm" @onclick="@(() => ShowLeaseholderDeletionConfirmationModalWindowAsync(leaseholder))">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 @code {
-    List<LeaseholderModel> leaseholdersRoster;
+    [CascadingParameter]
+    public IModalService? ModalService { get; set; }
 
-    private async Task InsertData()
-    {
-        string sql = "insert into leaseholders (Id, FirstName, LastName) values (@Id, @FirstName, @LastName);";
+    private int sequenceNumber;
 
-        await _data.SaveData(sql, new { Id = 37, FirstName = "Funky", LastName = "Africa" }, 
-            _config.GetConnectionString("DapperDbConnection"));
-
-        await OnInitializedAsync();
-    }
-
-    private async Task UpdateData()
-    {
-        string sql = "update leaseholders set FirstName = @FirstName where LastName = @LastName";
-
-        await _data.SaveData(sql, new { FirstName = "Funktor", LastName = "Africa" }, _config.GetConnectionString("DapperDbConnection"));
-
-        await OnInitializedAsync();
-    }
-
-    private async Task DeleteData()
-    {
-        string sql = "delete from leaseholders where LastName = @LastName";
-
-        await _data.SaveData(sql, new { LastName = "Africa" }, _config.GetConnectionString("DapperDbConnection"));
-
-        await OnInitializedAsync();
-    }
+    private List<AddressModel> Addresses { get; set; }
+    private List<EmailAddressModel> EmailAddresses { get; set; }
+    private List<LeaseholderModel> Leaseholders { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        string sql = "select * from leaseholders";
+        Addresses = await _addressServiceDapper.GetAddressesListDapper();
+        EmailAddresses = await _emailAddressServiceDapper.GetEmailAddressesListDapper();
+        Leaseholders = await _leaseholderServiceDapper.GetLeaseholdersListDapper();
+    }
 
-        leaseholdersRoster = await _data.LoadData<LeaseholderModel, dynamic>(sql, new { }, _config.GetConnectionString("DapperDbConnection"));
+    private void IncrementSequenceNumber()
+    {
+        sequenceNumber++;
+    }
+
+    private async Task ShowAddAddressModalWindowAsync(LeaseholderModel leaseholder)
+    {
+        var modalParameters = new ModalParameters();
+        modalParameters.Add(nameof(AddAddressToLeaseholder_Dapper.Leaseholder), leaseholder);
+
+        var addAddressEditForm = ModalService.Show<AddAddressToLeaseholder_Dapper>("Add Address to Leaseholder", modalParameters);
+        var addAddressEditFormResult = await addAddressEditForm.Result;
+    }
+
+    private async Task ShowAddEmailAddressModalWindowAsync(LeaseholderModel leaseholder)
+    {
+        var modalParameters = new ModalParameters();
+        modalParameters.Add(nameof(AddEmailAddressToLeaseholder_Dapper.Leaseholder), leaseholder);
+
+        var addEmailAddressEditForm = ModalService.Show<AddEmailAddressToLeaseholder_Dapper>("Add Email Address to Leaseholder", modalParameters);
+        var addEmailAddressEditFormResult = await addEmailAddressEditForm.Result;
+    }
+
+    private async Task ShowLeaseholderDeletionConfirmationModalWindowAsync(LeaseholderModel leaseholder)
+    {
+        var modalParameters = new ModalParameters();
+        modalParameters.Add(nameof(LeaseholderDeletionConfirmation_Dapper.Leaseholder), leaseholder);
+
+        var leaseholderDeletionConfirmationWindow = ModalService.Show<LeaseholderDeletionConfirmation_Dapper>(
+            "Are you sure you want to delete this leaseholder?", modalParameters);
+        var leaseholderDeletionConfirmationWindowResult = await leaseholderDeletionConfirmationWindow.Result;
+    }
+
+    private async Task ShowAddLeaseholderModalWindowAsync()
+    {
+        var addLeaseholderEditForm = ModalService.Show<AddLeaseholder_Dapper>("Add New Leaseholder");
+        var addLeaseholderEditFormResult = await addLeaseholderEditForm.Result;
     }
 }
+

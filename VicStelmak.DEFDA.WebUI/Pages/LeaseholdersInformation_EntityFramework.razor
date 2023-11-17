@@ -1,6 +1,6 @@
 ﻿@page "/leaseholdersinformation_entityframework"
 
-@using VicStelmak.DEFDA.WebUI.Pages.Components;
+@using VicStelmak.DEFDA.WebUI.Pages.Components_EntityFramework;
 
 <PageTitle>Leaseholders Information</PageTitle>
 
@@ -83,9 +83,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Leaseholders = await _leaseholderService.GetLeaseholdersListAsync();
-        EmailAddresses = await _emailAddressService.GetEmailAddressesListAsync();
-        Addresses = await _addressService.GetAddressesListAsync();
+        Leaseholders = await _leaseholderServiceEf.GetLeaseholdersListEfAsync();
+        EmailAddresses = await _emailAddressServiceEf.GetEmailAddressesListEfAsync();
+        Addresses = await _addressServiceEf.GetAddressesListEfAsync();
     }
 
     private void IncrementSequenceNumber()

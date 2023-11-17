@@ -1,4 +1,4 @@
-﻿@page "/leaseholdersinformation_entityframework/details/{id:int}"
+﻿@page "/leaseholdersinformation_dapper/details/{id:int}"
 
 <PageTitle>Leaseholders Information</PageTitle>
 
@@ -9,7 +9,7 @@
             <h1>@Leaseholder.FirstName @Leaseholder.LastName</h1>
         </div>
         <div class="col-lg-3 text-right">
-            <a type="button" class="btn btn-secondary btn-sm" href="/leaseholdersinformation_entityframework">Go Back To List</a>
+            <a type="button" class="btn btn-secondary btn-sm" href="/leaseholdersinformation_dapper">Go Back To List</a>
         </div>
     </div>
 
@@ -42,7 +42,7 @@
                 <th scope="row">Leaseholder's Email Addresses</th>
                 <td>
                     <ul>
-                        @foreach(var emailAddress in EmailAddresses.Where(e => e.LeaseholderId == Leaseholder.Id))
+                        @foreach (var emailAddress in EmailAddresses.Where(e => e.LeaseholderId == Leaseholder.Id))
                         {
                             <li>@emailAddress.EmailAddress</li>
                         }
@@ -52,21 +52,22 @@
         </tbody>
     </table>
 
-@code {
+    @code {
     [Parameter]
     public int Id { get; set; }
 
-    public LeaseholderModel Leaseholder { get; set; }
+    private LeaseholderModel Leaseholder { get; set; }
 
     private List<AddressModel> Addresses { get; set; }
     private List<EmailAddressModel> EmailAddresses { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Leaseholder = await _leaseholderServiceEf.GetLeaseholderByIdEfAsync(Id);
-        EmailAddresses = await _emailAddressServiceEf.GetEmailAddressesListEfAsync();
-        Addresses = await _addressServiceEf.GetAddressesListEfAsync();
+        Addresses = await _addressServiceDapper.GetAddressesListDapper();
+        EmailAddresses = await _emailAddressServiceDapper.GetEmailAddressesListDapper();
+        Leaseholder = await _leaseholderServiceDapper.GetLeaseholderByIdDapperAsync(Id);
     }
 }
 }
+
 

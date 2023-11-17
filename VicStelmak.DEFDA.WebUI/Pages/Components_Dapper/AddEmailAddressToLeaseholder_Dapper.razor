@@ -1,0 +1,49 @@
+﻿@inject NavigationManager _navManager
+
+@if (Leaseholder != null)
+{
+    <div class="row">
+        <div class="col-lg-9">
+            <h2>@Leaseholder.FirstName @Leaseholder.LastName</h2><br>
+        </div>
+    </div>
+
+    <EditForm Model="@EmailAddress" OnValidSubmit="@SubmitEmailAddressAsync">
+        <div class="form-group">
+            <label>You Can Add Email Address Below:</label>
+            <InputText class="form-control" @bind-Value="EmailAddress.EmailAddress" />
+        </div>
+        <br>
+        <button type="submit" class="btn btn-primary">Add</button>
+        <button type="button" class="btn btn-warning" style="margin: 7px 0px" @onclick="@(e => CancelEdit())">Cancel</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public LeaseholderModel Leaseholder { get; set; }
+
+    private EmailAddressModel EmailAddress { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        EmailAddress = new EmailAddressModel();
+    }
+
+    private async void SubmitEmailAddressAsync()
+    {
+        if (!string.IsNullOrEmpty(EmailAddress.EmailAddress))
+        {
+            await _emailAddressServiceDapper.CreateEmailAddressByLeaseholderIdDapper(EmailAddress, Leaseholder.Id);
+        }
+
+        _navManager.NavigateTo("/leaseholdersinformation_dapper", forceLoad: true);
+    }
+
+    private void CancelEdit()
+    {
+        _navManager.NavigateTo("/leaseholdersinformation_dapper");
+    }
+}
+
+
