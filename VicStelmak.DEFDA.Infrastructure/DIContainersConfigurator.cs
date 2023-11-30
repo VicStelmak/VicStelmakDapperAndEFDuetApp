@@ -23,7 +23,7 @@ namespace VicStelmak.DEFDA.Infrastructure
                 throw new InvalidOperationException("Connection string 'EFDbConnection' not found.");
 
             services.AddDbContextFactory<RentalDbContextEf>(options =>
-                options.UseMySql(connectionStringEf, new MySqlServerVersion(new Version(8, 0, 33)), mySqlOptions =>
+                options.UseMySql(connectionStringEf, new MySqlServerVersion(new Version(8, 2, 0)), mySqlOptions =>
                 {
                     mySqlOptions.SchemaBehavior(MySqlSchemaBehavior.Ignore);
                     mySqlOptions.MigrationsAssembly(typeof(RentalDbContextEf).Assembly.FullName);

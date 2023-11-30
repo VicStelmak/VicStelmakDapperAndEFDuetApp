@@ -28,7 +28,6 @@ namespace VicStelmak.DEFDA.Infrastructure.DataAccess
         {
             using (IDbConnection connection = new MySqlConnection(_connectionString))
             {
-                
                 await connection.ExecuteAsync(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
             }
         }
