@@ -1,6 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Blazored.Modal;
+using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using VicStelmak.DEFDA.Application.Interfaces_Dapper;
 using VicStelmak.DEFDA.Application.Interfaces_EntityFramework;
@@ -9,12 +8,13 @@ using VicStelmak.DEFDA.Application.Services_EntityFramework;
 using VicStelmak.DEFDA.Infrastructure.DataAccess;
 using VicStelmak.DEFDA.Infrastructure.DataAccess.Repositories;
 using VicStelmak.DEFDA.Infrastructure.DataAccess.Repositories_Dapper;
+using VicStelmak.DEFDA.WebUI.Data;
 
-namespace VicStelmak.DEFDA.Infrastructure
+namespace VicStelmak.DEFDA.WebUI
 {
-    public static class DIContainersConfigurator
+    public static class DependencyInjectionConfigurator
     {
-        public static IServiceCollection ConfigureDependencyInjection(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructureDependencies(this IServiceCollection services, IConfiguration configuration)
         {
             var connectionStringDapper = configuration.GetConnectionString("DapperDbConnection") ??
                 throw new InvalidOperationException("Connection string 'DapperDbConnection' not found.");
@@ -45,6 +45,16 @@ namespace VicStelmak.DEFDA.Infrastructure
 
             return services;
         }
+
+        public static IServiceCollection AddPresentationDependencies(this IServiceCollection services)
+        {
+            // Add services to the container.
+            services.AddBlazoredModal();
+            services.AddRazorPages();
+            services.AddServerSideBlazor();
+            services.AddSingleton<WeatherForecastService>();
+
+            return services;
+        }
     }
 }
-

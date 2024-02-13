@@ -1,15 +1,10 @@
-using Blazored.Modal;
-using VicStelmak.DEFDA.Infrastructure;
-using VicStelmak.DEFDA.WebUI.Data;
+using VicStelmak.DEFDA.WebUI;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddBlazoredModal();
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
-builder.Services.ConfigureDependencyInjection(builder.Configuration);
+builder.Services
+    .AddInfrastructureDependencies(builder.Configuration)
+    .AddPresentationDependencies();
 
 var app = builder.Build();
 
