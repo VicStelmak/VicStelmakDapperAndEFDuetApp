@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VicStelmak.DEFDA.Infrastruc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VicStelmak.DEFDA.WebUI", "VicStelmak.DEFDA.WebUI\VicStelmak.DEFDA.WebUI.csproj", "{5889609D-E89E-41E6-AEE9-0C6CB04F8ABE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VicStelmak.DEFDA.BusinessLogic", "VicStelmak.DEFDA.BusinessLogic\VicStelmak.DEFDA.BusinessLogic.csproj", "{09F30B5D-F622-4B0C-9FF7-951D9146E456}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VicStelmak.DEFDA.Domain", "VicStelmak.DEFDA.Domain\VicStelmak.DEFDA.Domain.csproj", "{09F30B5D-F622-4B0C-9FF7-951D9146E456}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VicStelmak.DEFDA.Application", "VicStelmak.DEFDA.Application\VicStelmak.DEFDA.Application.csproj", "{A556D16A-62C2-47D1-837F-C77454C360CC}"
 EndProject

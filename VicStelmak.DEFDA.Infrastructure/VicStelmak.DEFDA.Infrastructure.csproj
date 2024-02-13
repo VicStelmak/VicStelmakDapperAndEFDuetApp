@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\VicStelmak.DEFDA.Application\VicStelmak.DEFDA.Application.csproj" />
+    <ProjectReference Include="..\VicStelmak.DEFDA.Domain\VicStelmak.DEFDA.Domain.csproj" />
   </ItemGroup>
 
 </Project>

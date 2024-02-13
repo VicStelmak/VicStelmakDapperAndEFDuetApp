@@ -14,8 +14,7 @@ namespace VicStelmak.DEFDA.Infrastructure
 {
     public static class DIContainersConfigurator
     {
-        public static IServiceCollection ConfigureDependencyInjection(this
-            IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection ConfigureDependencyInjection(this IServiceCollection services, IConfiguration configuration)
         {
             var connectionStringDapper = configuration.GetConnectionString("DapperDbConnection") ??
                 throw new InvalidOperationException("Connection string 'DapperDbConnection' not found.");

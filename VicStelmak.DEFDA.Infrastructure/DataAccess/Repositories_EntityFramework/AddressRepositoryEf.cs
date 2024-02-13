@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VicStelmak.DEFDA.Application.Interfaces_EntityFramework;
-using VicStelmak.DEFDA.BusinessLogic.Models;
+using VicStelmak.DEFDA.Domain.Models;
 
 namespace VicStelmak.DEFDA.Infrastructure.DataAccess.Repositories
 {

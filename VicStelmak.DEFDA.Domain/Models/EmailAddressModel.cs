@@ -1,4 +1,4 @@
-﻿namespace VicStelmak.DEFDA.BusinessLogic.Models
+﻿namespace VicStelmak.DEFDA.Domain.Models
 {
     public class EmailAddressModel
     {

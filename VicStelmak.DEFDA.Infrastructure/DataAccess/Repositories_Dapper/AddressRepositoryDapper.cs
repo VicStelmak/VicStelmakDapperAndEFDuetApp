@@ -1,7 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
-using System.Net.Mail;
-using VicStelmak.DEFDA.Application.Interfaces_Dapper;
-using VicStelmak.DEFDA.BusinessLogic.Models;
+﻿using VicStelmak.DEFDA.Application.Interfaces_Dapper;
+using VicStelmak.DEFDA.Domain.Models;
 
 namespace VicStelmak.DEFDA.Infrastructure.DataAccess.Repositories_Dapper
 {

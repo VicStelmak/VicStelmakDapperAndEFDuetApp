@@ -1,4 +1,4 @@
-﻿using VicStelmak.DEFDA.BusinessLogic.Models;
+﻿using VicStelmak.DEFDA.Domain.Models;
 
 namespace VicStelmak.DEFDA.Application.Interfaces_Dapper
 {
