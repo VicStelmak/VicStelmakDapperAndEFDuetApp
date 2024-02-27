@@ -1,7 +1,7 @@
 ﻿@inject NavigationManager _navManager
 
 <div>
-    <button type="button" class="btn btn-danger btn-sm" @onclick="@(l => DeleteAddressDapper(Address))">Confirm</button>
+    <button type="button" class="btn btn-danger btn-sm" @onclick="@(l => DeleteAddressDapper(AddressId))">Confirm</button>
     <button type="button" class="btn btn-warning btn-sm" @onclick="@(() => CancelDeletion())">Cancel</button>
 </div>
 
@@ -10,14 +10,11 @@
     public IModalService? ModalService { get; set; }
 
     [Parameter]
-    public AddressModel Address { get; set; }
+    public int AddressId { get; set; }
 
-    private async Task DeleteAddressDapper(AddressModel address)
+    private async Task DeleteAddressDapper(int addressId)
     {
-        if (address != null)
-        {
-            await _addressServiceDapper.DeleteAddressDapper(address.Id);
-        }
+        await _mediator.Send(new DeleteAddressDapperCommand(addressId));
 
         _navManager.NavigateTo(_navManager.Uri, true);
     }

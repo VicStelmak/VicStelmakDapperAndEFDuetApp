@@ -24,8 +24,24 @@ namespace VicStelmak.DEFDA.Infrastructure.DataAccess.Repositories_Dapper
 
         public Task DeleteEmailAddressDapper(int id) => _dbAccessDapper.SaveDataAsync("spEmailAddresses_DeleteEmailAddress", new { argId = id });
 
+        public async Task<EmailAddressModel> GetEmailAddressByIdDapperAsync(int emailAddressId)
+        {
+            var getEmailAddressResult = await _dbAccessDapper.LoadDataAsync<EmailAddressModel, dynamic>("spEmailAddresses_GetEmailAddressById", new
+            {
+                argEmailAddressId = emailAddressId
+            });
+
+            return getEmailAddressResult.FirstOrDefault();
+        }
+
         public Task<List<EmailAddressModel>> GetEmailAddressesListDapper() =>
             _dbAccessDapper.LoadDataAsync<EmailAddressModel, dynamic>("spEmailAddresses_GetAllEmailAddresses", new { });
+
+        public Task<List<EmailAddressModel>> GetEmailAddressesListForSpecifiedLeaseholderDapper(int leaseholderId) =>
+           _dbAccessDapper.LoadDataAsync<EmailAddressModel, dynamic>("spEmailAddresses_GetAllEmailAddressesForSpecifiedLeaseholder", new
+           {
+               argLeaseholderId = leaseholderId
+           });
 
         public Task UpdateEmailAddressDapper(EmailAddressModel emailAddress) =>
             _dbAccessDapper.SaveDataAsync("spEmailAddresses_UpdateEmailAddress", new {

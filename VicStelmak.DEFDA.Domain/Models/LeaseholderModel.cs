@@ -4,11 +4,12 @@
     {
         public int Id { get; set; }
 
+        public List<AddressModel> Addresses { get; } = new List<AddressModel>();
+
+        public List<EmailAddressModel> EmailAddresses { get; } = new List<EmailAddressModel>();
+
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
-
-        public List<AddressModel> Addresses { get; } = new List<AddressModel>();
-        public List<EmailAddressModel> EmailAddresses { get; } = new List<EmailAddressModel>();
     }
 }

@@ -6,7 +6,9 @@ namespace VicStelmak.DEFDA.Application.Interfaces_Dapper
     {
         Task CreateAddressByLeaseholderIdDapper(AddressModel address, int leaseholderId);
         Task DeleteAddressDapper(int id);
+        Task<AddressModel> GetAddressByIdDapperAsync(int addressId);
         Task<List<AddressModel>> GetAddressesListDapper();
+        Task<List<AddressModel>> GetAddressesListForSpecifiedLeaseholderDapper(int leaseholderId);
         Task UpdateAddressDapper(AddressModel address);
     }
 }

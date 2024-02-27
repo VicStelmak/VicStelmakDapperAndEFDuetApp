@@ -1,9 +1,12 @@
 ﻿using Blazored.Modal;
+using Mapster;
+using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using System.Reflection;
+using VicStelmak.DEFDA.Application;
 using VicStelmak.DEFDA.Application.Interfaces_Dapper;
 using VicStelmak.DEFDA.Application.Interfaces_EntityFramework;
-using VicStelmak.DEFDA.Application.Services_Dapper;
 using VicStelmak.DEFDA.Application.Services_EntityFramework;
 using VicStelmak.DEFDA.Infrastructure.DataAccess;
 using VicStelmak.DEFDA.Infrastructure.DataAccess.Repositories;
@@ -14,6 +17,18 @@ namespace VicStelmak.DEFDA.WebUI
 {
     public static class DependencyInjectionConfigurator
     {
+        public static IServiceCollection AddApplicationDependencies(this IServiceCollection services)
+        {
+            var mapperConfiguration = TypeAdapterConfig.GlobalSettings;
+            mapperConfiguration.Scan(Assembly.GetExecutingAssembly());
+            
+            services.AddMediatR(config => config.RegisterServicesFromAssemblyContaining<MediatREntrypoint>());
+            services.AddSingleton(mapperConfiguration);
+            services.AddSingleton<IMapper, ServiceMapper>();
+
+            return services;
+        }
+
         public static IServiceCollection AddInfrastructureDependencies(this IServiceCollection services, IConfiguration configuration)
         {
             var connectionStringDapper = configuration.GetConnectionString("DapperDbConnection") ??
@@ -31,11 +46,8 @@ namespace VicStelmak.DEFDA.WebUI
 
             services.AddSingleton<ISqlDbAccessDapper>(s => new SqlDbAccessDapper(connectionStringDapper));
             services.AddSingleton<IAddressRepositoryDapper, AddressRepositoryDapper>();
-            services.AddSingleton<IAddressServiceDapper, AddressServiceDapper>();
             services.AddSingleton<IEmailAddressRepositoryDapper, EmailAddressRepositoryDapper>();
-            services.AddSingleton<IEmailAddressServiceDapper, EmailAddressServiceDapper>();
             services.AddSingleton<ILeaseholderRepositoryDapper, LeaseholderRepositoryDapper>();
-            services.AddSingleton<ILeaseholderServiceDapper, LeaseholderServiceDapper>();
             services.AddScoped<ILeaseholderRepositoryEf, LeaseholderRepositoryEf>();
             services.AddScoped<ILeaseholderServiceEf, LeaseholderServiceEf>();
             services.AddScoped<IEmailAddressRepositoryEf, EmailAddressRepositoryEf>();

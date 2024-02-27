@@ -1,45 +1,58 @@
 ﻿@inject NavigationManager _navManager
 
-<EditForm Model="@Address" OnValidSubmit="@SubmitAddressAsync">
-    <div class="form-group">
-        <label>Postal Code</label>
-        <InputText class="form-control" @bind-Value="Address.PostalCode" />
-    </div>
-    <div class="form-group">
-        <label>Apartment Number</label>
-        <InputNumber class="form-control" @bind-Value="Address.ApartmentNumber" />
-    </div>
-    <div class="form-group">
-        <label>Building Number</label>
-        <InputText class="form-control" @bind-Value="Address.BuildingNumber" />
-    </div>
-    <div class="form-group">
-        <label>Street</label>
-        <InputText class="form-control" @bind-Value="Address.Street" />
-    </div>
-    <div class="form-group">
-        <label>City</label>
-        <InputText class="form-control" @bind-Value="Address.City" />
-    </div>
-    <div class="form-group">
-        <label>Region</label>
-        <InputText class="form-control" @bind-Value="Address.Region" />
-    </div>
+@if(AddressViewModel != null)
+{
+    <EditForm Model="@AddressViewModel" OnValidSubmit="@SubmitAddressAsync">
+        <div class="form-group">
+            <label>Postal Code</label>
+            <InputText class="form-control" @bind-Value="AddressViewModel.PostalCode" />
+        </div>
+        <div class="form-group">
+            <label>Apartment Number</label>
+            <InputNumber class="form-control" @bind-Value="AddressViewModel.ApartmentNumber" />
+        </div>
+        <div class="form-group">
+            <label>Building Number</label>
+            <InputText class="form-control" @bind-Value="AddressViewModel.BuildingNumber" />
+        </div>
+        <div class="form-group">
+            <label>Street</label>
+            <InputText class="form-control" @bind-Value="AddressViewModel.Street" />
+        </div>
+        <div class="form-group">
+            <label>City</label>
+            <InputText class="form-control" @bind-Value="AddressViewModel.City" />
+        </div>
+        <div class="form-group">
+            <label>Region</label>
+            <InputText class="form-control" @bind-Value="AddressViewModel.Region" />
+        </div>
 
-    <button type="submit" class="btn btn-primary" style="margin: 7px 0px">Update</button>
-    <button type="button" class="btn btn-warning" style="margin: 7px 0px" @onclick="@(a => CancelEdit())">Cancel</button>
-</EditForm>
+        <button type="submit" class="btn btn-primary" style="margin: 7px 0px">Update</button>
+        <button type="button" class="btn btn-warning" style="margin: 7px 0px" @onclick="@(a => CancelEdit())">Cancel</button>
+    </EditForm>
+}
+
 
 @code {
     [Parameter]
-    public AddressModel Address { get; set; }
+    public int AddressId { get; set; }
+
+    public EditAddressDapperViewModel AddressViewModel { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var address = await _mediator.Send(new GetAddressByIdDapperQuery(AddressId));
+        AddressViewModel = new(address);
+    }
 
     private async void SubmitAddressAsync()
     {
-        if (!string.IsNullOrEmpty(Address.PostalCode) && !string.IsNullOrEmpty(Address.BuildingNumber) && !string.IsNullOrEmpty(Address.Street)
-            && !string.IsNullOrEmpty(Address.City) && !string.IsNullOrEmpty(Address.Region) && Address.ApartmentNumber != 0)
+        if (AddressViewModel.CheckIfValuesAreValid())
         {
-            await _addressServiceDapper.UpdateAddressDapper(Address);
+            var addressUpdatingRequest = _mapper.From(AddressViewModel).AdaptToType<UpdateAddressRequest>();
+
+            await _mediator.Send(new UpdateAddressDapperCommand(AddressId, addressUpdatingRequest));
         }
 
         _navManager.NavigateTo(_navManager.Uri, true);

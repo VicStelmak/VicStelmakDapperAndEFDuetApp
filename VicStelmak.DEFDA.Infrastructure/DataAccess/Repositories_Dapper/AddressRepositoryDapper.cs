@@ -27,13 +27,26 @@ namespace VicStelmak.DEFDA.Infrastructure.DataAccess.Repositories_Dapper
                 argLeaseholderId = leaseholderId
             });
 
-        public Task DeleteAddressDapper(int id)
+        public Task DeleteAddressDapper(int leaseholderId)
         {
-            return _dbAccessDapper.SaveDataAsync("spAddresses_DeleteAddress", new { argId = id });
+            return _dbAccessDapper.SaveDataAsync("spAddresses_DeleteAddress", new { argId = leaseholderId });
+        }
+
+        public async Task<AddressModel> GetAddressByIdDapperAsync(int addressId)
+        {
+            var getAddressResult = await _dbAccessDapper.LoadDataAsync<AddressModel, dynamic>("spAddresses_GetAddressById", new { 
+                argAddressId = addressId });
+
+            return getAddressResult.FirstOrDefault();
         }
 
         public Task<List<AddressModel>> GetAddressesListDapper() => 
             _dbAccessDapper.LoadDataAsync<AddressModel, dynamic>("spAddresses_GetAllAddresses", new { });
+
+        public Task<List<AddressModel>> GetAddressesListForSpecifiedLeaseholderDapper(int leaseholderId) =>
+            _dbAccessDapper.LoadDataAsync<AddressModel, dynamic>("spAddresses_GetAllAddressesForSpecifiedLeaseholder", new { 
+                argLeaseholderId = leaseholderId }
+            );
 
         public Task UpdateAddressDapper(AddressModel address)
         {

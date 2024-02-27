@@ -20,9 +20,9 @@ namespace VicStelmak.DEFDA.Infrastructure.DataAccess.Repositories_Dapper
                argCity = address.City,
                argEmailAddress = emailAddress.EmailAddress,
                argFirstName = leaseholder.FirstName,
+               argLastName = leaseholder.LastName,
                argPostalCode = address.PostalCode,
                argRegion = address.Region,
-               argLastName = leaseholder.LastName,
                argStreet = address.Street
            });
 

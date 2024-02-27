@@ -3,6 +3,7 @@ using VicStelmak.DEFDA.WebUI;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
+    .AddApplicationDependencies()
     .AddInfrastructureDependencies(builder.Configuration)
     .AddPresentationDependencies();
 

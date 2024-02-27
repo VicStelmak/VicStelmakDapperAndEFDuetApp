@@ -2,36 +2,29 @@
 
 <PageTitle>Leaseholders Information</PageTitle>
 
-@if (Leaseholder != null)
+@if (LeaseholderViewModel != null)
 {
     <div class="row">
-        <div class="col-lg-9">
-            <h1>@Leaseholder.FirstName @Leaseholder.LastName</h1>
-        </div>
         <div class="col-lg-3 text-right">
             <a type="button" class="btn btn-secondary btn-sm" href="/leaseholdersinformation_dapper">Go Back To List</a>
         </div>
     </div>
-
+    <br />
     <table class="table">
         <tbody>
             <tr>
-                <th scope="row">Leaseholder Id</th>
-                <td>@Leaseholder.Id</td>
-            </tr>
-            <tr>
                 <th scope="row">Leaseholder First Name</th>
-                <td>@Leaseholder.FirstName</td>
+                <td>@LeaseholderViewModel.FirstName</td>
             </tr>
             <tr>
                 <th scope="row">Leaseholder Last Name</th>
-                <td>@Leaseholder.LastName</td>
+                <td>@LeaseholderViewModel.LastName</td>
             </tr>
             <tr>
                 <th scope="row">Leaseholder Addresses</th>
                 <td>
                     <ul>
-                        @foreach (var address in Addresses.Where(a => a.LeaseholderId == Leaseholder.Id))
+                        @foreach (var address in LeaseholderViewModel.Addresses)
                         {
                             <li>@address.PostalCode, @address.ApartmentNumber, @address.BuildingNumber, @address.Street, @address.City, @address.Region</li>
                         }
@@ -42,7 +35,7 @@
                 <th scope="row">Leaseholder's Email Addresses</th>
                 <td>
                     <ul>
-                        @foreach (var emailAddress in EmailAddresses.Where(e => e.LeaseholderId == Leaseholder.Id))
+                        @foreach (var emailAddress in LeaseholderViewModel.EmailAddresses)
                         {
                             <li>@emailAddress.EmailAddress</li>
                         }
@@ -56,18 +49,20 @@
     [Parameter]
     public int Id { get; set; }
 
-    private LeaseholderModel Leaseholder { get; set; }
-
-    private List<AddressModel> Addresses { get; set; }
-    private List<EmailAddressModel> EmailAddresses { get; set; }
+    private LeaseholderDetailsDapperViewModel? LeaseholderViewModel { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Addresses = await _addressServiceDapper.GetAddressesListDapper();
-        EmailAddresses = await _emailAddressServiceDapper.GetEmailAddressesListDapper();
-        Leaseholder = await _leaseholderServiceDapper.GetLeaseholderByIdDapperAsync(Id);
+        var leaseholder = await _mediator.Send(new GetLeaseholderByIdDapperQuery(Id));
+        LeaseholderViewModel = new(leaseholder);
+        LeaseholderViewModel.Addresses = await _mediator.Send(new GetAddressesListForSpecifiedLeaseholderDapperQuery(Id));
+        LeaseholderViewModel.AddressesWithoutIdAndLeaseholderId = LeaseholderViewModel.Addresses.Select(
+            address => _mapper.From(address).AdaptToType<AddressWithoutIdAndLeaseholderIdResponse>()).ToList();
+        LeaseholderViewModel.EmailAddresses = await _mediator.Send(new GetEmailAddressesListForSpecifiedLeaseholderDapperQuery(Id));
+        LeaseholderViewModel.EmailAddressesWithoutIdAndLeaseholderId = LeaseholderViewModel.EmailAddresses.Select(
+            emailAddress => _mapper.From(emailAddress).AdaptToType<EmailAddressWithoutIdAndLeaseholderIdResponse>()).ToList();
     }
-}
+    }
 }
 
 
