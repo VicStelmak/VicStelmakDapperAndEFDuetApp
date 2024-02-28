@@ -15,9 +15,9 @@ using VicStelmak.DEFDA.WebUI.Data;
 
 namespace VicStelmak.DEFDA.WebUI
 {
-    public static class DependencyInjectionConfigurator
+    internal static class DependencyInjectionConfigurator
     {
-        public static IServiceCollection AddApplicationDependencies(this IServiceCollection services)
+        internal static IServiceCollection AddApplicationDependencies(this IServiceCollection services)
         {
             var mapperConfiguration = TypeAdapterConfig.GlobalSettings;
             mapperConfiguration.Scan(Assembly.GetExecutingAssembly());
@@ -29,7 +29,7 @@ namespace VicStelmak.DEFDA.WebUI
             return services;
         }
 
-        public static IServiceCollection AddInfrastructureDependencies(this IServiceCollection services, IConfiguration configuration)
+        internal static IServiceCollection AddInfrastructureDependencies(this IServiceCollection services, IConfiguration configuration)
         {
             var connectionStringDapper = configuration.GetConnectionString("DapperDbConnection") ??
                 throw new InvalidOperationException("Connection string 'DapperDbConnection' not found.");
@@ -58,7 +58,7 @@ namespace VicStelmak.DEFDA.WebUI
             return services;
         }
 
-        public static IServiceCollection AddPresentationDependencies(this IServiceCollection services)
+        internal static IServiceCollection AddPresentationDependencies(this IServiceCollection services)
         {
             // Add services to the container.
             services.AddBlazoredModal();
