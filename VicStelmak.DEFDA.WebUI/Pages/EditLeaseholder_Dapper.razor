@@ -113,10 +113,10 @@
     
     [Parameter]
     public int Id { get; set; }
+    
+    private int sequenceNumber;
 
     private EditLeaseholderDapperViewModel LeaseholderViewModel { get; set; }
-
-    private int sequenceNumber;
 
     protected override async Task OnInitializedAsync()
     {

@@ -4,7 +4,7 @@ using VicStelmak.DEFDA.Domain.Models;
 
 namespace VicStelmak.DEFDA.Application.Mappers
 {
-    public static class LeaseholderMapper
+    internal static class LeaseholderMapper
     {
         internal static LeaseholderModel MapToLeaseholder(this CreateLeaseholderRequest leaseholderCreatingRequest)
         {
@@ -15,7 +15,7 @@ namespace VicStelmak.DEFDA.Application.Mappers
             };
         }
 
-        public static LeaseholderModel MapToLeaseholder(this UpdateLeaseholderRequest leaseholderUpdatingRequest)
+        internal static LeaseholderModel MapToLeaseholder(this UpdateLeaseholderRequest leaseholderUpdatingRequest)
         {
             return new LeaseholderModel()
             {
@@ -24,7 +24,7 @@ namespace VicStelmak.DEFDA.Application.Mappers
             };
         }
 
-        public static LeaseholderResponse MapToLeaseholderResponse(this LeaseholderModel leaseholder)
+        internal static LeaseholderResponse MapToLeaseholderResponse(this LeaseholderModel leaseholder)
         {
             return new LeaseholderResponse(leaseholder.Id, leaseholder.FirstName, leaseholder.LastName);
         }

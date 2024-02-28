@@ -5,7 +5,7 @@ using VicStelmak.DEFDA.Application.Mappers;
 
 namespace VicStelmak.DEFDA.Application.Handlers.Dapper
 {
-    internal class CreateLeaseholderDapperHandler : IRequestHandler<CreateLeaseholderDapperCommand>
+    public class CreateLeaseholderDapperHandler : IRequestHandler<CreateLeaseholderDapperCommand>
     {
         private readonly ILeaseholderRepositoryDapper _leaseholderRepository;
 

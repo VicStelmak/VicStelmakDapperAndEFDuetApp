@@ -4,9 +4,9 @@ using VicStelmak.DEFDA.Domain.Models;
 
 namespace VicStelmak.DEFDA.Application.Mappers
 {
-    public static class EmailAddressMapper
+    internal static class EmailAddressMapper
     {
-        public static EmailAddressModel MapToEmailAddress(this CreateEmailAddressRequest emailAddressCreatingRequest)
+        internal static EmailAddressModel MapToEmailAddress(this CreateEmailAddressRequest emailAddressCreatingRequest)
         {
             return new EmailAddressModel()
             {
@@ -22,7 +22,7 @@ namespace VicStelmak.DEFDA.Application.Mappers
             };
         }
 
-        public static EmailAddressModel MapToEmailAddress(this UpdateEmailAddressRequest emailAddressUpdatingRequest)
+        internal static EmailAddressModel MapToEmailAddress(this UpdateEmailAddressRequest emailAddressUpdatingRequest)
         {
             return new EmailAddressModel()
             {
@@ -31,7 +31,7 @@ namespace VicStelmak.DEFDA.Application.Mappers
             };
         }
 
-        public static EmailAddressResponse MapToEmailAddressResponse(this EmailAddressModel emailAddress)
+        internal static EmailAddressResponse MapToEmailAddressResponse(this EmailAddressModel emailAddress)
         {
             return new EmailAddressResponse(emailAddress.Id, emailAddress.EmailAddress, emailAddress.LeaseholderId);
         }

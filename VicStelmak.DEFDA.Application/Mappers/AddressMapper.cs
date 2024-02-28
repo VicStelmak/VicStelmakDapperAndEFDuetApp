@@ -4,9 +4,9 @@ using VicStelmak.DEFDA.Domain.Models;
 
 namespace VicStelmak.DEFDA.Application.Mappers
 {
-    public static class AddressMapper
+    internal static class AddressMapper
     {
-        public static AddressModel MapToAddress(this CreateAddressRequest addressCreatingRequest)
+        internal static AddressModel MapToAddress(this CreateAddressRequest addressCreatingRequest)
         {
             return new AddressModel()
             {
@@ -32,7 +32,7 @@ namespace VicStelmak.DEFDA.Application.Mappers
             };
         }
 
-        public static AddressModel MapToAddress(this UpdateAddressRequest addressUpdatingRequest)
+        internal static AddressModel MapToAddress(this UpdateAddressRequest addressUpdatingRequest)
         {
             return new AddressModel()
             {
@@ -45,7 +45,7 @@ namespace VicStelmak.DEFDA.Application.Mappers
             };
         }
 
-        public static AddressResponse MapToAddressResponse(this AddressModel address) 
+        internal static AddressResponse MapToAddressResponse(this AddressModel address) 
         {
             return new AddressResponse(
                 address.Id,
