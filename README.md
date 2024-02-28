@@ -4,4 +4,6 @@ My C# program for testing of Dapper and Entity Framework being used in one solut
 - Blazor.Server,
 - Dapper,
 - Entity Framework,
+- Mapster,
+- MediatR,
 - MySQL.
