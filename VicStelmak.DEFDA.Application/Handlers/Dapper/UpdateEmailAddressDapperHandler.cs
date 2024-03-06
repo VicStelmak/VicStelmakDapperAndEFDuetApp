@@ -17,7 +17,7 @@ namespace VicStelmak.DEFDA.Application.Handlers.Dapper
         public Task Handle(UpdateEmailAddressDapperCommand request, CancellationToken cancellationToken)
         {
             var emailAddress = request.emailAddressUpdatingRequest.MapToEmailAddress();
-            emailAddress.Id = request.emailId;
+            emailAddress.Id = request.emailAddressId;
             var emailAddressUpdatingResult = _emailAddressRepository.UpdateEmailAddressDapper(emailAddress);
 
             return Task.CompletedTask;

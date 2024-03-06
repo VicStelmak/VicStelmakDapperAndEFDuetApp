@@ -26,7 +26,6 @@ namespace VicStelmak.DEFDA.Application.Mappers
         {
             return new EmailAddressModel()
             {
-                Id = emailAddressUpdatingRequest.Id,
                 EmailAddress = emailAddressUpdatingRequest.EmailAddress
             };
         }
