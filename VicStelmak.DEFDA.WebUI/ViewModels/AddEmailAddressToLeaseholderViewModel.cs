@@ -2,14 +2,19 @@
 
 namespace VicStelmak.DEFDA.WebUI.ViewModels
 {
-    public class EditEmailAddressDapperViewModel
+    public class AddEmailAddressToLeaseholderViewModel
     {
-        public EditEmailAddressDapperViewModel(EmailAddressResponse emailAddress)
+        public AddEmailAddressToLeaseholderViewModel(LeaseholderResponse leaseholder)
         {
-            EmailAddress = emailAddress.EmailAddress;
+            FirstName = leaseholder.FirstName;
+            LastName = leaseholder.LastName;
         }
 
         public string EmailAddress { get; set; }
+
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
 
         internal bool CheckIfValuesAreValid()
         {

@@ -2,16 +2,12 @@
 
 namespace VicStelmak.DEFDA.WebUI.ViewModels
 {
-    public class EditAddressDapperViewModel
+    public class AddAddressToLeaseholderViewModel
     {
-        public EditAddressDapperViewModel(AddressResponse address)
+        public AddAddressToLeaseholderViewModel(LeaseholderResponse leaseholder)
         {
-            ApartmentNumber = address.ApartmentNumber;
-            BuildingNumber = address.BuildingNumber;
-            City = address.City;
-            PostalCode = address.PostalCode;
-            Region = address.Region;
-            Street = address.Street;
+            FirstName = leaseholder.FirstName;
+            LastName = leaseholder.LastName;
         }
 
         public int ApartmentNumber { get; set; }
@@ -19,6 +15,10 @@ namespace VicStelmak.DEFDA.WebUI.ViewModels
         public string BuildingNumber { get; set; }
 
         public string City { get; set; }
+
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
 
         public string PostalCode { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿namespace VicStelmak.DEFDA.WebUI.ViewModels
 {
-    public class AddLeaseholderDapperViewModel
+    public class AddLeaseholderViewModel
     {
         public int ApartmentNumber { get; set; }
 

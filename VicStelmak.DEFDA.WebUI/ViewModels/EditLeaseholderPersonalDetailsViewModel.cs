@@ -2,9 +2,9 @@
 
 namespace VicStelmak.DEFDA.WebUI.ViewModels
 {
-    public class EditLeaseholderPersonalDetailsDapperViewModel
+    public class EditLeaseholderPersonalDetailsViewModel
     {
-        public EditLeaseholderPersonalDetailsDapperViewModel(LeaseholderResponse leaseholder)
+        public EditLeaseholderPersonalDetailsViewModel(LeaseholderResponse leaseholder)
         {
             FirstName = leaseholder.FirstName;
             LastName = leaseholder.LastName;

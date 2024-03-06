@@ -2,7 +2,7 @@
 
 namespace VicStelmak.DEFDA.WebUI.ViewModels
 {
-    public class LeaseholderInformationDapperViewModel
+    public class LeaseholdersInformationViewModel
     {
         public List<LeaseholderResponse> Leaseholders { get; set; } = new List<LeaseholderResponse>();
 
