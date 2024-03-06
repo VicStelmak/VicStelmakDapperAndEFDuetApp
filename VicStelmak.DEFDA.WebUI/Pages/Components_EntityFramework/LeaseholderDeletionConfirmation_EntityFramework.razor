@@ -1,25 +1,17 @@
 ﻿@inject NavigationManager _navManager
 
 <div>
-    <button type="button" class="btn btn-danger btn-sm" @onclick="@(l => DeleteLeaseholderEfAsync(Leaseholder.Id))">Confirm</button>
+    <button type="button" class="btn btn-danger btn-sm" @onclick="@(l => DeleteLeaseholderEfAsync(LeaseholderId))">Confirm</button>
     <button type="button" class="btn btn-warning btn-sm" @onclick="@(() => CancelDeletion())">Cancel</button>
 </div>
 
 @code {
-    [CascadingParameter]
-    public IModalService? ModalService { get; set; }
-
     [Parameter]
-    public LeaseholderModel Leaseholder { get; set; }
+    public int LeaseholderId { get; set; }
 
     private async Task DeleteLeaseholderEfAsync(int leaseholderId)
     {
-        var leaseholder = await _leaseholderServiceEf.GetLeaseholderByIdEfAsync(leaseholderId);
-
-        if (leaseholder != null)
-        {
-            await _leaseholderServiceEf.DeleteLeaseholderEfAsync(leaseholder);
-        }
+        await _leaseholderServiceEf.DeleteLeaseholderEfAsync(leaseholderId);
 
         _navManager.NavigateTo("/leaseholdersinformation_entityframework", forceLoad: true);
     }

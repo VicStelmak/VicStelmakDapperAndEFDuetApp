@@ -1,27 +1,40 @@
 ﻿@inject NavigationManager _navManager
 
-<EditForm Model="@Leaseholder" OnValidSubmit="@SubmitLeaseholderAsync">
-    <div class="form-group">
-        <label>First Name</label>
-        <InputText class="form-control" @bind-Value="Leaseholder.FirstName" />
-    </div>
-    <div class="form-group">
-        <label>Last Name</label>
-        <InputText class="form-control" @bind-Value="Leaseholder.LastName" />
-    </div>
-    <button type="submit" class="btn btn-primary" style="margin: 7px 0px">Update</button>
-    <button type="button" class="btn btn-warning" style="margin: 7px 0px" @onclick="@(e => CancelEdit())">Cancel</button>
-</EditForm>
+@if (LeaseholderViewModel != null)
+{
+    <EditForm Model="@LeaseholderViewModel" OnValidSubmit="@SubmitLeaseholderAsync">
+        <div class="form-group">
+            <label>First Name</label>
+            <InputText class="form-control" @bind-Value="LeaseholderViewModel.FirstName" />
+        </div>
+        <div class="form-group">
+            <label>Last Name</label>
+            <InputText class="form-control" @bind-Value="LeaseholderViewModel.LastName" />
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin: 7px 0px">Update</button>
+        <button type="button" class="btn btn-warning" style="margin: 7px 0px" @onclick="@(e => CancelEdit())">Cancel</button>
+    </EditForm>
+}
 
 @code {
     [Parameter]
-    public LeaseholderModel Leaseholder { get; set; }
+    public int LeaseholderId { get; set; }
+
+    private EditLeaseholderPersonalDetailsViewModel LeaseholderViewModel { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var leaseholder = await _leaseholderServiceEf.GetLeaseholderByIdEfAsync(LeaseholderId);
+        LeaseholderViewModel = new(leaseholder);
+    }
 
     private async void SubmitLeaseholderAsync()
     {
-        if (string.IsNullOrEmpty(Leaseholder.FirstName) == false && string.IsNullOrEmpty(Leaseholder.LastName) == false)
+        if (LeaseholderViewModel.CheckIfValuesAreValid())
         {
-            await _leaseholderServiceEf.UpdateLeaseholderEfAsync(Leaseholder);
+            var leaseholderUpdatingRequest = _mapper.From(LeaseholderViewModel).AdaptToType<UpdateLeaseholderRequest>();
+
+            await _leaseholderServiceEf.UpdateLeaseholderEfAsync(LeaseholderId, leaseholderUpdatingRequest);
         }
 
         _navManager.NavigateTo(_navManager.Uri, true);

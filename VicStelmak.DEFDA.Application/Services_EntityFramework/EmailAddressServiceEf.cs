@@ -1,45 +1,58 @@
 ﻿using VicStelmak.DEFDA.Application.Interfaces_EntityFramework;
-using VicStelmak.DEFDA.Domain.Models;
+using VicStelmak.DEFDA.Application.Mappers;
+using VicStelmak.DEFDA.Application.Requests;
+using VicStelmak.DEFDA.Application.Responses;
 
 namespace VicStelmak.DEFDA.Application.Services_EntityFramework
 {
     public class EmailAddressServiceEf : IEmailAddressServiceEf
     {
-        private readonly IEmailAddressRepositoryEf _emailAddressRepositoryDapper;
+        private readonly IEmailAddressRepositoryEf _emailAddressRepository;
 
         public EmailAddressServiceEf(IEmailAddressRepositoryEf emailAddressRepository)
         {
-            _emailAddressRepositoryDapper = emailAddressRepository;
+            _emailAddressRepository = emailAddressRepository;
         }
 
-        public async Task<List<EmailAddressModel>> GetEmailAddressesListEfAsync()
+        public async Task CreateEmailAddressByLeaseholderIdEfAsync(CreateEmailAddressRequest emailAddressCreatingRequest, int leaseholderId)
         {
-            return await _emailAddressRepositoryDapper.GetEmailAddressesListEfAsync();
+            var emailAddress = emailAddressCreatingRequest.MapToEmailAddress();
+
+            await _emailAddressRepository.CreateEmailAddressByLeaseholderIdEfAsync(emailAddress, leaseholderId);
         }
 
-        public async Task<EmailAddressModel> GetEmailAddressByIdEfAsync(int id)
+        public async Task DeleteEmailAddressEfAsync(int emailAddressId)
         {
-            return await _emailAddressRepositoryDapper.GetEmailAddressByIdEfAsync(id);
+            await _emailAddressRepository.DeleteEmailAddressEfAsync(emailAddressId);
         }
 
-        public async Task UpdateEmailAddressEfAsync(EmailAddressModel emailAddress)
+        public async Task<EmailAddressResponse> GetEmailAddressByIdEfAsync(int emailAddressId)
         {
-            await _emailAddressRepositoryDapper.UpdateEmailAddressEfAsync(emailAddress);
+            var emailAddress = await _emailAddressRepository.GetEmailAddressByIdEfAsync(emailAddressId);
+
+            return emailAddress.MapToEmailAddressResponse();
         }
 
-        public async Task<EmailAddressModel> CreateEmailAddressEfAsync(EmailAddressModel emailAddress)
+        public async Task<List<EmailAddressResponse>> GetEmailAddressesListForSpecifiedLeaseholderEfAsync(int leaseholderId)
         {
-            return await _emailAddressRepositoryDapper.CreateEmailAddressEfAsync(emailAddress);
+            var emailAddresses = await _emailAddressRepository.GetEmailAddressesListForSpecifiedLeaseholderEfAsync(leaseholderId);
+
+            return emailAddresses.Select(emailAddress => emailAddress.MapToEmailAddressResponse()).ToList();
         }
 
-        public async Task<EmailAddressModel> CreateEmailAddressByLeaseholderIdEfAsync(EmailAddressModel emailAddress, int leaseholderId)
+        public async Task<List<EmailAddressResponse>> GetEmailAddressesListEfAsync()
         {
-            return await _emailAddressRepositoryDapper.CreateEmailAddressByLeaseholderIdEfAsync(emailAddress, leaseholderId);
+            var emailAddresses = await _emailAddressRepository.GetEmailAddressesListEfAsync();
+
+            return emailAddresses.Select(emailAddress => emailAddress.MapToEmailAddressResponse()).ToList();
         }
 
-        public async Task DeleteEmailAddressEfAsync(EmailAddressModel emailAddress)
+        public async Task UpdateEmailAddressEfAsync(int emailAddressId, UpdateEmailAddressRequest emailAddressUpdatingRequest)
         {
-            await _emailAddressRepositoryDapper.DeleteEmailAddressEfAsync(emailAddress);
+            var emailAddress = emailAddressUpdatingRequest.MapToEmailAddress();
+            emailAddress.Id = emailAddressId;
+
+            await _emailAddressRepository.UpdateEmailAddressEfAsync(emailAddress);
         }
     }
 }

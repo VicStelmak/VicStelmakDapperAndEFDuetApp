@@ -1,27 +1,40 @@
 ﻿@inject NavigationManager _navManager
 
-<EditForm Model="@EmailAddress" OnValidSubmit="@SubmitEmailAddressAsync">
-    <div class="form-group">
-        <InputText class="form-control" @bind-Value="EmailAddress.EmailAddress" />
-    </div>
-    <button type="submit" class="btn btn-primary" style="flex:1;margin: 7px 0px">Update</button>
-    <button type="button" class="btn btn-warning" style="flex:1;margin: 7px 0px" @onclick="CancelEdit">Cancel</button>
-</EditForm>
+@if (EmailAddressViewModel != null)
+{
+    <EditForm Model="@EmailAddressViewModel" OnValidSubmit="@SubmitEmailAddressAsync">
+        <div class="form-group">
+            <InputText class="form-control" @bind-Value="EmailAddressViewModel.EmailAddress" />
+        </div>
+        <button type="submit" class="btn btn-primary" style="flex:1;margin: 7px 0px">Update</button>
+        <button type="button" class="btn btn-warning" style="flex:1;margin: 7px 0px" @onclick="CancelEdit">Cancel</button>
+    </EditForm>
+}
 
 @code {
     [Parameter]
-    public EmailAddressModel EmailAddress { get; set; }
+    public int EmailAddressId { get; set; }
+
+    private EditEmailAddressViewModel EmailAddressViewModel { get; set; }
 
     private void CancelEdit()
     {
         _navManager.NavigateTo(_navManager.Uri, true);
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+        var emailAddress = await _emailAddressServiceEf.GetEmailAddressByIdEfAsync(EmailAddressId);
+        EmailAddressViewModel = new(emailAddress);
+    }
+
     private async void SubmitEmailAddressAsync()
     {
-        if (string.IsNullOrEmpty(EmailAddress.EmailAddress) == false)
+        if (EmailAddressViewModel.CheckIfValuesAreValid())
         {
-            await _emailAddressServiceEf.UpdateEmailAddressEfAsync(EmailAddress);
+            var emailAddressUpdatingRequest = _mapper.From(EmailAddressViewModel).AdaptToType<UpdateEmailAddressRequest>();
+
+            await _emailAddressServiceEf.UpdateEmailAddressEfAsync(EmailAddressId, emailAddressUpdatingRequest);
         }
 
         _navManager.NavigateTo(_navManager.Uri, true);

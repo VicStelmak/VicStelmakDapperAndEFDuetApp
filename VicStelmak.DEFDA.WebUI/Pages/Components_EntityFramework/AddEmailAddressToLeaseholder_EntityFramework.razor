@@ -1,17 +1,17 @@
 ﻿@inject NavigationManager _navManager
 
-@if (Leaseholder != null)
+@if (EmailAddressViewModel != null)
 {
     <div class="row">
         <div class="col-lg-9">
-            <h2>@Leaseholder.FirstName @Leaseholder.LastName</h2><br>
+            <h2>@EmailAddressViewModel.FirstName @EmailAddressViewModel.LastName</h2><br>
         </div>
     </div>
 
-    <EditForm Model="@EmailAddress" OnValidSubmit="@SubmitEmailAddressAsync">
+    <EditForm Model="@EmailAddressViewModel" OnValidSubmit="@SubmitEmailAddressAsync">
         <div class="form-group">
             <label>You Can Add Email Address Below:</label>
-            <InputText class="form-control" @bind-Value="EmailAddress.EmailAddress" />
+            <InputText class="form-control" @bind-Value="EmailAddressViewModel.EmailAddress" />
         </div>
         <br>
         <button type="submit" class="btn btn-primary">Add</button>
@@ -21,20 +21,23 @@
 
 @code {
     [Parameter]
-    public LeaseholderModel Leaseholder { get; set; }
+    public int LeaseholderId { get; set; }
 
-    private EmailAddressModel EmailAddress { get; set; } 
+    private AddEmailAddressToLeaseholderViewModel EmailAddressViewModel { get; set; } 
 
     protected override async Task OnInitializedAsync()
     {
-        EmailAddress = new EmailAddressModel();
+        var leaseholder = await _leaseholderServiceEf.GetLeaseholderByIdEfAsync(LeaseholderId);
+        EmailAddressViewModel = new(leaseholder);
     }
 
     private async void SubmitEmailAddressAsync()
     {
-        if (!string.IsNullOrEmpty(EmailAddress.EmailAddress))
+        if (EmailAddressViewModel.CheckIfValuesAreValid() == true)
         {
-            await _emailAddressServiceEf.CreateEmailAddressByLeaseholderIdEfAsync(EmailAddress, Leaseholder.Id);
+            var emailAddressCreatingRequest = _mapper.Map<CreateEmailAddressRequest>(EmailAddressViewModel);
+
+            await _emailAddressServiceEf.CreateEmailAddressByLeaseholderIdEfAsync(emailAddressCreatingRequest, LeaseholderId);
         }
 
         _navManager.NavigateTo("/leaseholdersinformation_entityframework", forceLoad:true);

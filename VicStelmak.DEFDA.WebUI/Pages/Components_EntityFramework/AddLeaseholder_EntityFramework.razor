@@ -1,75 +1,65 @@
 ﻿@inject NavigationManager _navManager
 
-@if (Leaseholder != null)
+@if (LeaseholderViewModel != null)
 {
-    <EditForm Model="@Leaseholder" OnValidSubmit="@SubmitLeaseholderAsync">
+    <EditForm Model="@LeaseholderViewModel" OnValidSubmit="@SubmitLeaseholderAsync">
         <div class="form-group">
             <label>First Name</label>
-            <InputText class="form-control" @bind-Value="Leaseholder.FirstName" />
+            <InputText class="form-control" @bind-Value="LeaseholderViewModel.FirstName" />
         </div>
         <div class="form-group">
             <label>Last Name</label>
-            <InputText class="form-control" @bind-Value="Leaseholder.LastName" />
+            <InputText class="form-control" @bind-Value="LeaseholderViewModel.LastName" />
         </div>
         <div class="form-group">
             <label>Email Address</label>
-            <InputText class="form-control" @bind-Value="EmailAddress.EmailAddress" />
+            <InputText class="form-control" @bind-Value="LeaseholderViewModel.EmailAddress" />
         </div>
         <h2>Address</h2>
         <div class="form-group">
             <label>Postal Code</label>
-            <InputText id="PostalCode" class="form-control" @bind-Value="Address.PostalCode" />
+            <InputText class="form-control" @bind-Value="LeaseholderViewModel.PostalCode" />
         </div>
         <div class="form-group">
             <label>Apartment Number</label>
-            <InputNumber class="form-control" @bind-Value="Address.ApartmentNumber" />
+            <InputNumber class="form-control" @bind-Value="LeaseholderViewModel.ApartmentNumber" />
         </div>
         <div class="form-group">
             <label>Building Number</label>
-            <InputText class="form-control" @bind-Value="Address.BuildingNumber" />
+            <InputText class="form-control" @bind-Value="LeaseholderViewModel.BuildingNumber" />
         </div>
         <div class="form-group">
             <label>Street</label>
-            <InputText class="form-control" @bind-Value="Address.Street" />
+            <InputText class="form-control" @bind-Value="LeaseholderViewModel.Street" />
         </div>
         <div class="form-group">
             <label>City</label>
-            <InputText class="form-control" @bind-Value="Address.City" />
+            <InputText class="form-control" @bind-Value="LeaseholderViewModel.City" />
         </div>
         <div class="form-group">
             <label>Region</label>
-            <InputText class="form-control" @bind-Value="Address.Region" />
+            <InputText class="form-control" @bind-Value="LeaseholderViewModel.Region" />
         </div>
         <br>
         <button type="submit" class="btn btn-primary">Create</button>
     </EditForm>
 }
 
-
 @code {
-    private AddressModel Address { get; set; }
-    private EmailAddressModel EmailAddress { get; set; }
-    private LeaseholderModel Leaseholder { get; set; }
+    private AddLeaseholderViewModel LeaseholderViewModel { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Address = new AddressModel();
-        Leaseholder = new LeaseholderModel();
-        EmailAddress = new EmailAddressModel();
+        LeaseholderViewModel = new();
     }
 
     private async void SubmitLeaseholderAsync()
     {
-        await _leaseholderServiceEf.CreateLeaseholderEfAsync(Leaseholder);
-        
-        if (!string.IsNullOrEmpty(Address.PostalCode) && !string.IsNullOrEmpty(Address.BuildingNumber) && !string.IsNullOrEmpty(Address.Street) 
-            && !string.IsNullOrEmpty(Address.City) && !string.IsNullOrEmpty(Address.Region) && Address.ApartmentNumber != 0)
+        if (LeaseholderViewModel.CheckIfValuesAreValid() == true)
         {
-            await _addressServiceEf.CreateAddressByLeaseholderIdEfAsync(Address, Leaseholder.Id);
-        }
-        if(!string.IsNullOrEmpty(EmailAddress.EmailAddress))
-        {
-            await _emailAddressServiceEf.CreateEmailAddressByLeaseholderIdEfAsync(EmailAddress, Leaseholder.Id);
+            var leaseholderCreatingRequest = _mapper.Map<CreateLeaseholderRequest>(LeaseholderViewModel);
+
+            await _leaseholderServiceEf.CreateLeaseholderEfAsync(leaseholderCreatingRequest);
         }
 
         _navManager.NavigateTo("/leaseholdersinformation_entityframework", forceLoad:true);

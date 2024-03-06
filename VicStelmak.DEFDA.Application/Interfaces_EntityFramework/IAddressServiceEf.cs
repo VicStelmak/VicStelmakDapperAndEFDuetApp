@@ -1,13 +1,15 @@
-﻿using VicStelmak.DEFDA.Domain.Models;
+﻿using VicStelmak.DEFDA.Application.Requests;
+using VicStelmak.DEFDA.Application.Responses;
 
 namespace VicStelmak.DEFDA.Application.Interfaces_EntityFramework
 {
     public interface IAddressServiceEf
     {
-        Task<List<AddressModel>> GetAddressesListEfAsync();
-        Task<AddressModel> GetAddressByIdEfAsync(int id);
-        Task<AddressModel> CreateAddressByLeaseholderIdEfAsync(AddressModel address, int leaseholderId);
-        Task UpdateAddressEfAsync(AddressModel address);
-        Task DeleteAddressEfAsync(AddressModel address);
+        Task CreateAddressByLeaseholderIdEfAsync(CreateAddressRequest addressCreatingRequest, int leaseholderId);
+        Task DeleteAddressEfAsync(int addressId);
+        Task<AddressResponse> GetAddressByIdEfAsync(int addressId);
+        Task<List<AddressResponse>> GetAddressesListForSpecifiedLeaseholderEfAsync(int leaseholderId);
+        Task<List<AddressResponse>> GetAddressesListEfAsync();
+        Task UpdateAddressEfAsync(int addressId, UpdateAddressRequest addressUpdatingRequest);
     }
 }

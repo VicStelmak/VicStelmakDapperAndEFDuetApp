@@ -13,6 +13,57 @@ namespace VicStelmak.DEFDA.Infrastructure.DataAccess.Repositories
             _dbContextFactory = dbcontextfactory;
         }
 
+        public async Task CreateAddressByLeaseholderIdEfAsync(AddressModel address, int leaseholderId)
+        {
+            using (var dbContextFactory = _dbContextFactory.CreateDbContext())
+            {
+                var addressForCreating = new AddressModel()
+                {
+                    ApartmentNumber = address.ApartmentNumber,
+                    BuildingNumber = address.BuildingNumber,
+                    City = address.City,
+                    LeaseholderId = leaseholderId,
+                    PostalCode = address.PostalCode,
+                    Region = address.Region,
+                    Street = address.Street
+                };
+
+                dbContextFactory.Addresses.Add(addressForCreating);
+
+                await dbContextFactory.SaveChangesAsync();
+            }
+        }
+
+        public async Task DeleteAddressEfAsync(int addressId)
+        {
+            using (var dbContextFactory = _dbContextFactory.CreateDbContext())
+            {
+                var addressForDeleting = await dbContextFactory.Addresses.FirstOrDefaultAsync(address => address.Id == addressId);
+
+                dbContextFactory.Addresses.Remove(addressForDeleting);
+
+                await dbContextFactory.SaveChangesAsync();
+            }
+        }
+
+        public async Task<AddressModel> GetAddressByIdEfAsync(int addressId)
+        {
+            using (var dbContextFactory = _dbContextFactory.CreateDbContext())
+            {
+                return await dbContextFactory.Addresses.FirstOrDefaultAsync(address => address.Id == addressId);
+            }
+        }
+
+        public async Task<List<AddressModel>> GetAddressesListForSpecifiedLeaseholderEfAsync(int leaseholderId)
+        {
+            using (var dbContextFactory = _dbContextFactory.CreateDbContext())
+            {
+                var addresses = await dbContextFactory.Addresses.ToListAsync();
+
+                return addresses.Where(address => address.LeaseholderId == leaseholderId).ToList();
+            }
+        }
+
         public async Task<List<AddressModel>> GetAddressesListEfAsync()
         {
             using (var dbContextFactory = _dbContextFactory.CreateDbContext())
@@ -21,43 +72,24 @@ namespace VicStelmak.DEFDA.Infrastructure.DataAccess.Repositories
             }
         }
 
-        public async Task<AddressModel> GetAddressByIdEfAsync(int id)
-        {
-            using (var dbContextFactory = _dbContextFactory.CreateDbContext())
-            {
-                return await dbContextFactory.Addresses.FirstOrDefaultAsync(a => a.LeaseholderId == id);
-            }
-        }
-
-        //<summary>
-        //// This method creates email address and inserts it into database and then sets Foreign key as the value of Primary key in the Parent table (Leaseholders)/ 
-        //</summary>
-        public async Task<AddressModel> CreateAddressByLeaseholderIdEfAsync(AddressModel address, int leaseholderId)
-        {
-            using (var dbContextFactory = _dbContextFactory.CreateDbContext())
-            {
-                dbContextFactory.Addresses.Add(address);
-                address.LeaseholderId = leaseholderId;
-                await dbContextFactory.SaveChangesAsync();
-                return address;
-            }
-        }
-
         public async Task UpdateAddressEfAsync(AddressModel address)
         {
-            using (var dbContextFactory = _dbContextFactory.CreateDbContext())
-            {
-                dbContextFactory.Addresses.Update(address);
-                await dbContextFactory.SaveChangesAsync();
-            }
-        }
+            int addressId = address.Id;
 
-        public async Task DeleteAddressEfAsync(AddressModel address)
-        {
             using (var dbContextFactory = _dbContextFactory.CreateDbContext())
             {
-                dbContextFactory.Addresses.Remove(address);
-                await dbContextFactory.SaveChangesAsync();
+                var addressForUpdating = await dbContextFactory.Addresses.FirstOrDefaultAsync(address => address.Id == addressId);
+                if (addressForUpdating != null) 
+                {
+                    addressForUpdating.ApartmentNumber = address.ApartmentNumber;
+                    addressForUpdating.BuildingNumber = address.BuildingNumber;
+                    addressForUpdating.City = address.City;
+                    addressForUpdating.PostalCode = address.PostalCode;
+                    addressForUpdating.Region = address.Region;
+                    addressForUpdating.Street = address.Street;
+
+                    await dbContextFactory.SaveChangesAsync();
+                }
             }
         }
     }

@@ -1,14 +1,15 @@
-﻿using VicStelmak.DEFDA.Domain.Models;
+﻿using VicStelmak.DEFDA.Application.Requests;
+using VicStelmak.DEFDA.Application.Responses;
 
 namespace VicStelmak.DEFDA.Application.Interfaces_EntityFramework
 {
     public interface IEmailAddressServiceEf
     {
-        Task<List<EmailAddressModel>> GetEmailAddressesListEfAsync();
-        Task<EmailAddressModel> GetEmailAddressByIdEfAsync(int id);
-        Task<EmailAddressModel> CreateEmailAddressEfAsync(EmailAddressModel emailAddress);
-        Task<EmailAddressModel> CreateEmailAddressByLeaseholderIdEfAsync(EmailAddressModel emailAddress, int leaseholderId);
-        Task UpdateEmailAddressEfAsync(EmailAddressModel emailAddress);
-        Task DeleteEmailAddressEfAsync(EmailAddressModel emailAddress);
+        Task CreateEmailAddressByLeaseholderIdEfAsync(CreateEmailAddressRequest emailAddressCreatingRequest, int leaseholderId);
+        Task DeleteEmailAddressEfAsync(int emailAddressId);
+        Task<EmailAddressResponse> GetEmailAddressByIdEfAsync(int emailAddressId);
+        Task<List<EmailAddressResponse>> GetEmailAddressesListForSpecifiedLeaseholderEfAsync(int leaseholderId);
+        Task<List<EmailAddressResponse>> GetEmailAddressesListEfAsync();
+        Task UpdateEmailAddressEfAsync(int emailAddressId, UpdateEmailAddressRequest emailAddressUpdatingRequest);
     }
 }

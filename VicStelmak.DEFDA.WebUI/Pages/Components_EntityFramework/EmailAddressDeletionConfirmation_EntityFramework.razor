@@ -1,23 +1,17 @@
 ﻿@inject NavigationManager _navManager
 
 <div>
-    <button type="button" class="btn btn-danger btn-sm" @onclick="@(l => DeleteEmailAddressEfAsync(EmailAddress))">Confirm</button>
+    <button type="button" class="btn btn-danger btn-sm" @onclick="@(l => DeleteEmailAddressEfAsync(EmailAddressId))">Confirm</button>
     <button type="button" class="btn btn-warning btn-sm" @onclick="@(() => CancelDeletion())">Cancel</button>
 </div>
 
 @code {
-    [CascadingParameter]
-    public IModalService? ModalService { get; set; }
-
     [Parameter]
-    public EmailAddressModel EmailAddress { get; set; }
+    public int EmailAddressId { get; set; }
 
-    private async Task DeleteEmailAddressEfAsync(EmailAddressModel emailAddress)
+    private async Task DeleteEmailAddressEfAsync(int emailAddressId)
     {
-        if (emailAddress != null)
-        {
-            await _emailAddressServiceEf.DeleteEmailAddressEfAsync(emailAddress);
-        }
+        await _emailAddressServiceEf.DeleteEmailAddressEfAsync(emailAddressId);
 
         _navManager.NavigateTo(_navManager.Uri, true);
     }

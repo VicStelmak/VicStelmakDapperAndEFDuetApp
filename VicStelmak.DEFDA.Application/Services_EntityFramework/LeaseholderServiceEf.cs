@@ -1,5 +1,7 @@
 ﻿using VicStelmak.DEFDA.Application.Interfaces_EntityFramework;
-using VicStelmak.DEFDA.Domain.Models;
+using VicStelmak.DEFDA.Application.Mappers;
+using VicStelmak.DEFDA.Application.Requests;
+using VicStelmak.DEFDA.Application.Responses;
 
 namespace VicStelmak.DEFDA.Application.Services_EntityFramework
 {
@@ -12,29 +14,40 @@ namespace VicStelmak.DEFDA.Application.Services_EntityFramework
             _leaseholderRepository = leaseholderRepository;
         }
 
-        public async Task<List<LeaseholderModel>> GetLeaseholdersListEfAsync()
+        public async Task CreateLeaseholderEfAsync(CreateLeaseholderRequest leaseholderCreatingRequest)
         {
-            return await _leaseholderRepository.GetLeaseholdersListEfAsync();
+            var address = leaseholderCreatingRequest.MapToAddress();
+            var emailAddress = leaseholderCreatingRequest.MapToEmailAddress();
+            var leaseholder = leaseholderCreatingRequest.MapToLeaseholder();
+
+            await _leaseholderRepository.CreateLeaseholderEfAsync(address, emailAddress, leaseholder);
         }
 
-        public async Task<LeaseholderModel> GetLeaseholderByIdEfAsync(int id)
+        public async Task DeleteLeaseholderEfAsync(int leaseholderId)
         {
-            return await _leaseholderRepository.GetLeaseholderByIdEfAsync(id);
+            await _leaseholderRepository.DeleteLeaseholderEfAsync(leaseholderId);
         }
 
-        public async Task<LeaseholderModel> CreateLeaseholderEfAsync(LeaseholderModel leaseholder)
+        public async Task<LeaseholderResponse> GetLeaseholderByIdEfAsync(int id)
         {
-            return await _leaseholderRepository.CreateLeaseholderEfAsync(leaseholder);
+            var leaseholder = await _leaseholderRepository.GetLeaseholderByIdEfAsync(id);
+
+            return leaseholder.MapToLeaseholderResponse();
         }
 
-        public async Task UpdateLeaseholderEfAsync(LeaseholderModel leaseholder)
+        public async Task<List<LeaseholderResponse>> GetLeaseholdersListEfAsync()
         {
+            var leaseholders = await _leaseholderRepository.GetLeaseholdersListEfAsync();
+
+            return leaseholders.Select(leaseholder => leaseholder.MapToLeaseholderResponse()).ToList();
+        }
+
+        public async Task UpdateLeaseholderEfAsync(int leaseholderId, UpdateLeaseholderRequest leaseholderUpdatingRequest)
+        {
+            var leaseholder = leaseholderUpdatingRequest.MapToLeaseholder();
+            leaseholder.Id = leaseholderId;
+
             await _leaseholderRepository.UpdateLeaseholderEfAsync(leaseholder);
-        }
-
-        public async Task DeleteLeaseholderEfAsync(LeaseholderModel leaseholder)
-        {
-            await _leaseholderRepository.DeleteLeaseholderEfAsync(leaseholder);
         }
     }
 }

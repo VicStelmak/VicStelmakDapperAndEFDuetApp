@@ -4,10 +4,11 @@ namespace VicStelmak.DEFDA.Application.Interfaces_EntityFramework
 {
     public interface IAddressRepositoryEf
     {
-        Task<List<AddressModel>> GetAddressesListEfAsync();
+        Task CreateAddressByLeaseholderIdEfAsync(AddressModel address, int leaseholderId);
+        Task DeleteAddressEfAsync(int addressId);
         Task<AddressModel> GetAddressByIdEfAsync(int id);
-        Task<AddressModel> CreateAddressByLeaseholderIdEfAsync(AddressModel address, int leaseholderId);
+        Task<List<AddressModel>> GetAddressesListForSpecifiedLeaseholderEfAsync(int leaseholderId);
+        Task<List<AddressModel>> GetAddressesListEfAsync();
         Task UpdateAddressEfAsync(AddressModel address);
-        Task DeleteAddressEfAsync(AddressModel address);
     }
 }

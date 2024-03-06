@@ -4,10 +4,10 @@ namespace VicStelmak.DEFDA.Application.Interfaces_EntityFramework
 {
     public interface ILeaseholderRepositoryEf
     {
-        Task<List<LeaseholderModel>> GetLeaseholdersListEfAsync();
+        Task CreateLeaseholderEfAsync(AddressModel address, EmailAddressModel emailAddress, LeaseholderModel leaseholder);
+        Task DeleteLeaseholderEfAsync(int leaseholderId);
         Task<LeaseholderModel> GetLeaseholderByIdEfAsync(int id);
-        Task<LeaseholderModel> CreateLeaseholderEfAsync(LeaseholderModel leaseholder);
+        Task<List<LeaseholderModel>> GetLeaseholdersListEfAsync();
         Task UpdateLeaseholderEfAsync(LeaseholderModel leaseholder);
-        Task DeleteLeaseholderEfAsync(LeaseholderModel leaseholder);
     }
 }

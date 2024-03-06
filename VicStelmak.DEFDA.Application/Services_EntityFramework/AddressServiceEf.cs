@@ -1,5 +1,7 @@
 ﻿using VicStelmak.DEFDA.Application.Interfaces_EntityFramework;
-using VicStelmak.DEFDA.Domain.Models;
+using VicStelmak.DEFDA.Application.Mappers;
+using VicStelmak.DEFDA.Application.Requests;
+using VicStelmak.DEFDA.Application.Responses;
 
 namespace VicStelmak.DEFDA.Application.Services_EntityFramework
 {
@@ -12,29 +14,46 @@ namespace VicStelmak.DEFDA.Application.Services_EntityFramework
             _addressRepository = addressRepository;
         }
 
-        public async Task<List<AddressModel>> GetAddressesListEfAsync()
+        public async Task CreateAddressByLeaseholderIdEfAsync(CreateAddressRequest addressCreatingRequest, int leaseholderId)
         {
-            return await _addressRepository.GetAddressesListEfAsync();
+            var address = addressCreatingRequest.MapToAddress();
+
+            await _addressRepository.CreateAddressByLeaseholderIdEfAsync(address, leaseholderId);
         }
 
-        public async Task<AddressModel> GetAddressByIdEfAsync(int id)
+        public async Task DeleteAddressEfAsync(int addressId)
         {
-            return await _addressRepository.GetAddressByIdEfAsync(id);
+            await _addressRepository.DeleteAddressEfAsync(addressId);
         }
 
-        public async Task<AddressModel> CreateAddressByLeaseholderIdEfAsync(AddressModel address, int leaseholderId)
+        public async Task<AddressResponse> GetAddressByIdEfAsync(int addressId)
         {
-            return await _addressRepository.CreateAddressByLeaseholderIdEfAsync(address, leaseholderId);
+            var address = await _addressRepository.GetAddressByIdEfAsync(addressId);
+
+            return address.MapToAddressResponse();
+
         }
 
-        public async Task UpdateAddressEfAsync(AddressModel address)
+        public async Task<List<AddressResponse>> GetAddressesListForSpecifiedLeaseholderEfAsync(int leaseholderId)
         {
+            var addresses = await _addressRepository.GetAddressesListForSpecifiedLeaseholderEfAsync(leaseholderId);
+
+            return addresses.Select(address => address.MapToAddressResponse()).ToList();
+        }
+
+        public async Task<List<AddressResponse>> GetAddressesListEfAsync()
+        {
+            var addresses = await _addressRepository.GetAddressesListEfAsync();
+
+            return addresses.Select(address => address.MapToAddressResponse()).ToList();
+        }
+
+        public async Task UpdateAddressEfAsync(int addressId, UpdateAddressRequest addressUpdatingRequest)
+        {
+            var address = addressUpdatingRequest.MapToAddress();
+            address.Id = addressId;
+
             await _addressRepository.UpdateAddressEfAsync(address);
-        }
-
-        public async Task DeleteAddressEfAsync(AddressModel address)
-        {
-            await _addressRepository.DeleteAddressEfAsync(address);
         }
     }
 }

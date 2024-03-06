@@ -13,13 +13,29 @@ namespace VicStelmak.DEFDA.Infrastructure.DataAccess.Repositories
             _dbContextFactory = dbcontextfactory;
         }
 
-        public async Task<List<LeaseholderModel>> GetLeaseholdersListEfAsync()
+        public async Task CreateLeaseholderEfAsync(AddressModel address, EmailAddressModel emailAddress, LeaseholderModel leaseholder)
         {
             using (var dbContextFactory = _dbContextFactory.CreateDbContext())
             {
-                return await dbContextFactory.Leaseholders
-                    .Include(l => l.EmailAddresses)
-                    .ToListAsync();
+                var leaseholderForCreating = new LeaseholderModel() { FirstName = leaseholder.FirstName, LastName = leaseholder.LastName };
+                leaseholderForCreating.Addresses.Add(address);
+                leaseholderForCreating.EmailAddresses.Add(emailAddress);
+
+                dbContextFactory.Leaseholders.Add(leaseholderForCreating);
+
+                await dbContextFactory.SaveChangesAsync();
+            }
+        }
+
+        public async Task DeleteLeaseholderEfAsync(int leaseholderId)
+        {
+            using (var dbContextFactory = _dbContextFactory.CreateDbContext())
+            {
+                var leaseholderForDeleting = await dbContextFactory.Leaseholders.FirstOrDefaultAsync(leaseholder => leaseholder.Id == leaseholderId);
+                
+                dbContextFactory.Leaseholders.Remove(leaseholderForDeleting);
+
+                await dbContextFactory.SaveChangesAsync();
             }
         }
 
@@ -27,37 +43,32 @@ namespace VicStelmak.DEFDA.Infrastructure.DataAccess.Repositories
         {
             using (var dbContextFactory = _dbContextFactory.CreateDbContext())
             {
-                return await dbContextFactory.Leaseholders
-                    .Include(l => l.EmailAddresses)
-                    .FirstOrDefaultAsync(l => l.Id == id);
+                return await dbContextFactory.Leaseholders.FirstOrDefaultAsync(leaseholder => leaseholder.Id == id);
             }
         }
 
-        public async Task<LeaseholderModel> CreateLeaseholderEfAsync(LeaseholderModel leaseholder)
+        public async Task<List<LeaseholderModel>> GetLeaseholdersListEfAsync()
         {
             using (var dbContextFactory = _dbContextFactory.CreateDbContext())
             {
-                dbContextFactory.Leaseholders.Add(leaseholder);
-                await dbContextFactory.SaveChangesAsync();
-                return leaseholder;
+                return await dbContextFactory.Leaseholders.ToListAsync();
             }
         }
 
         public async Task UpdateLeaseholderEfAsync(LeaseholderModel leaseholder)
         {
-            using (var dbContextFactory = _dbContextFactory.CreateDbContext())
-            {
-                dbContextFactory.Leaseholders.Update(leaseholder);
-                await dbContextFactory.SaveChangesAsync();
-            }
-        }
+            int leaseholderId = leaseholder.Id;
 
-        public async Task DeleteLeaseholderEfAsync(LeaseholderModel leaseholder)
-        {
             using (var dbContextFactory = _dbContextFactory.CreateDbContext())
             {
-                dbContextFactory.Leaseholders.Remove(leaseholder);
-                await dbContextFactory.SaveChangesAsync();
+                var leaseholderForUpdating = await dbContextFactory.Leaseholders.FirstOrDefaultAsync(leaseholder => leaseholder.Id == leaseholderId);
+                if (leaseholderForUpdating != null) 
+                {
+                    leaseholderForUpdating.FirstName = leaseholder.FirstName;
+                    leaseholderForUpdating.LastName = leaseholder.LastName;
+
+                    await dbContextFactory.SaveChangesAsync();
+                }
             }
         }
     }

@@ -13,6 +13,52 @@ namespace VicStelmak.DEFDA.Infrastructure.DataAccess.Repositories
             _dbContextFactory = dbcontextfactory;
         }
 
+        public async Task CreateEmailAddressByLeaseholderIdEfAsync(EmailAddressModel emailAddress, int leaseholderId)
+        {
+            using (var dbContextFactory = _dbContextFactory.CreateDbContext())
+            {
+                var emailAddressForCreating = new EmailAddressModel()
+                {
+                    EmailAddress = emailAddress.EmailAddress,
+                    LeaseholderId = leaseholderId
+                };
+
+                dbContextFactory.EmailAddresses.Add(emailAddressForCreating);
+
+                await dbContextFactory.SaveChangesAsync();
+            }
+        }
+
+        public async Task DeleteEmailAddressEfAsync(int emailAddressId)
+        {
+            using (var dbContextFactory = _dbContextFactory.CreateDbContext())
+            {
+                var emailAddressForDeleting = await dbContextFactory.EmailAddresses.FirstOrDefaultAsync(emailAddress => emailAddress.Id == emailAddressId);
+
+                dbContextFactory.EmailAddresses.Remove(emailAddressForDeleting);
+
+                await dbContextFactory.SaveChangesAsync();
+            }
+        }
+
+        public async Task<EmailAddressModel> GetEmailAddressByIdEfAsync(int emailAddressId)
+        {
+            using (var dbContextFactory = _dbContextFactory.CreateDbContext())
+            {
+                return await dbContextFactory.EmailAddresses.FirstOrDefaultAsync(emailAddress => emailAddress.Id == emailAddressId);
+            }
+        }
+
+        public async Task<List<EmailAddressModel>> GetEmailAddressesListForSpecifiedLeaseholderEfAsync(int leaseholderId)
+        {
+            using (var dbContextFactory = _dbContextFactory.CreateDbContext())
+            {
+                var emailAddresses = await dbContextFactory.EmailAddresses.ToListAsync();
+
+                return emailAddresses.Where(emailAddress => emailAddress.LeaseholderId == leaseholderId).ToList();
+            }
+        }
+
         public async Task<List<EmailAddressModel>> GetEmailAddressesListEfAsync()
         {
             using (var dbContextFactory = _dbContextFactory.CreateDbContext())
@@ -21,53 +67,19 @@ namespace VicStelmak.DEFDA.Infrastructure.DataAccess.Repositories
             }
         }
 
-        public async Task<EmailAddressModel> GetEmailAddressByIdEfAsync(int id)
-        {
-            using (var dbContextFactory = _dbContextFactory.CreateDbContext())
-            {
-                return await dbContextFactory.EmailAddresses.FirstOrDefaultAsync(e => e.LeaseholderId == id);
-            }
-        }
-
         public async Task UpdateEmailAddressEfAsync(EmailAddressModel emailAddress)
         {
-            using (var dbContextFactory = _dbContextFactory.CreateDbContext())
-            {
-                dbContextFactory.EmailAddresses.Update(emailAddress);
-                await dbContextFactory.SaveChangesAsync();
-            }
-        }
+            int emailAddressId = emailAddress.Id;
 
-        public async Task<EmailAddressModel> CreateEmailAddressEfAsync(EmailAddressModel emailAddress)
-        {
             using (var dbContextFactory = _dbContextFactory.CreateDbContext())
             {
-                dbContextFactory.EmailAddresses.Add(emailAddress);
-                await dbContextFactory.SaveChangesAsync();
-                return emailAddress;
-            }
-        }
+                var emailAddressForUpdating = await dbContextFactory.EmailAddresses.FirstOrDefaultAsync(emailAddress => emailAddress.Id == emailAddressId);
+                if (emailAddressForUpdating != null)
+                {
+                    emailAddressForUpdating.EmailAddress = emailAddress.EmailAddress;
 
-        //<summary>
-        //// This method creates email address and inserts it into database and then sets Foreign key as the value of Primary key in the Parent table (Leaseholders)/ 
-        //</summary>
-        public async Task<EmailAddressModel> CreateEmailAddressByLeaseholderIdEfAsync(EmailAddressModel emailAddress, int leaseholderId)
-        {
-            using (var dbContextFactory = _dbContextFactory.CreateDbContext())
-            {
-                dbContextFactory.EmailAddresses.Add(emailAddress);
-                emailAddress.LeaseholderId = leaseholderId;
-                await dbContextFactory.SaveChangesAsync();
-                return emailAddress;
-            }
-        }
-
-        public async Task DeleteEmailAddressEfAsync(EmailAddressModel emailAddress)
-        {
-            using (var dbContextFactory = _dbContextFactory.CreateDbContext())
-            {
-                dbContextFactory.EmailAddresses.Remove(emailAddress);
-                await dbContextFactory.SaveChangesAsync();
+                    await dbContextFactory.SaveChangesAsync();
+                }
             }
         }
     }
